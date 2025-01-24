@@ -365,6 +365,18 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 112
       objectReference: {fileID: 0}
+    - target: {fileID: 5598301680500330555, guid: 2c9153df91b527142b8b910b3b589f13, type: 3}
+      propertyPath: speed
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5598301680500330555, guid: 2c9153df91b527142b8b910b3b589f13, type: 3}
+      propertyPath: playerCamera
+      value: 
+      objectReference: {fileID: 6754505459375689748}
+    - target: {fileID: 5598301680500330555, guid: 2c9153df91b527142b8b910b3b589f13, type: 3}
+      propertyPath: mouseSensitivity
+      value: 300
+      objectReference: {fileID: 0}
     - target: {fileID: 5951452355180501399, guid: 2c9153df91b527142b8b910b3b589f13, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.015834332
@@ -422,6 +434,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c9153df91b527142b8b910b3b589f13, type: 3}
+--- !u!4 &6754505459375689748 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2593894709802907989, guid: 2c9153df91b527142b8b910b3b589f13, type: 3}
+  m_PrefabInstance: {fileID: 6754505459375689747}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

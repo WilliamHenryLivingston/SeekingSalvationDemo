@@ -7,16 +7,28 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     public float gravity = -9.81f;
     public float jumpHeight = 2f;
+    public float mouseSensitivity = 100f;
+
+    public Transform playerCamera;
 
     private CharacterController controller;
     private Vector3 velocity;
+    private float xRotation = 0f;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
+
+        Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen and hide it
     }
 
     void Update()
+    {
+        Movement();
+        MouseLook();
+    }
+
+    void Movement()
     {
         // Get input
         float horizontal = Input.GetAxis("Horizontal");
@@ -39,6 +51,21 @@ public class PlayerController : MonoBehaviour
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
+    }
+
+    void MouseLook()
+    {
+        //mouse Input
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+
+        //Adjust xRotation to rotate the camera down and up
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        //Rotate the camera and player
+        playerCamera.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        transform.Rotate(Vector3.up * mouseX);
     }
 }
 
