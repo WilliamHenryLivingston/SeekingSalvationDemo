@@ -15,8 +15,8 @@ public class LevelGenerator : MonoBehaviour
 
     public List<HexTile> hexTiles;
 
-    [Range(2, 10)]
-    public int gridSize = 100;
+    [Range(2, 100)]
+    public int gridSize = 10;
 
     private void Start()
     {
