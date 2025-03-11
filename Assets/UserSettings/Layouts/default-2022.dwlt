@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2560
     height: 1349.3334
   m_ShowMode: 4
-  m_Title: Project
+  m_Title: Scene
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -120,7 +120,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 81
+  controlID: 15
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -708,9 +708,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 4.412604, y: 1.624239, z: 32.33459}
+    m_Target: {x: -3.2067947, y: 2.3759289, z: 31.125813}
     speed: 2
-    m_Value: {x: 4.412604, y: 1.624239, z: 32.33459}
+    m_Value: {x: -3.2067947, y: 2.3759289, z: 31.125813}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -756,9 +756,9 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.23946814, y: -0.0059153335, z: 0.0014425914, w: -0.97093964}
+    m_Target: {x: -0.21417482, y: 0.20427647, z: -0.04586886, w: -0.95415264}
     speed: 2
-    m_Value: {x: -0.23848446, y: -0.005916461, z: 0.001436598, w: -0.97112733}
+    m_Value: {x: -0.2142087, y: 0.20331101, z: -0.045652144, w: -0.9543035}
   m_Size:
     m_Target: 10
     speed: 2
@@ -842,14 +842,14 @@ MonoBehaviour:
   m_LastFolders:
   - Assets
   m_LastFoldersGridSize: -1
-  m_LastProjectPath: D:\Unity\Unity Projects\SeekingSalvationDemo\SeekingSalvationDemo\Assets
+  m_LastProjectPath: D:\Unity\Unity Projects\SeekingSalvationDemo\Assets
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 32420000
-    m_LastClickedID: 16946
-    m_ExpandedIDs: 000000003242000000ca9a3b
+    m_SelectedIDs: 12410000
+    m_LastClickedID: 16658
+    m_ExpandedIDs: 000000001241000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -877,7 +877,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000032420000
+    m_ExpandedIDs: 0000000012410000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
