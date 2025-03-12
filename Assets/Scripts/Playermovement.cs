@@ -4,31 +4,40 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float speed = 2f;
+
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float mouseSensitivity = 100f;
 
-    public Transform playerCamera;
+    [Header("Player Stats")]
+
+    [SerializeField] private int maxHealth = 100;
+    [SerializeField] private int health;
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private int score;
+
+
+  public Transform playerCamera;
 
     private CharacterController controller;
     private Vector3 velocity;
     private float xRotation = 0f;
 
-    void Start()
+    private void Start()
     {
         controller = GetComponent<CharacterController>();
 
         Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen and hide it
+        health = maxHealth;
     }
 
-    void Update()
+    private void Update()
     {
         Movement();
         MouseLook();
     }
 
-    void Movement()
+    private void Movement()
     {
         // Get input
         float horizontal = Input.GetAxis("Horizontal");
@@ -53,7 +62,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void MouseLook()
+    private void MouseLook()
     {
         //mouse Input
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
@@ -66,6 +75,35 @@ public class PlayerController : MonoBehaviour
         //Rotate the camera and player
         playerCamera.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.Rotate(Vector3.up * mouseX);
+    }
+    
+    
+    //Pickup Handling Methods
+    public void IncreaseHealth(int amount) 
+    {
+        health += amount;
+        health = Mathf.Clamp(health, 0, maxHealth); // Prevent overhealing
+        Debug.Log("Health: " + health);
+    }
+
+    public void IncreaseSpeed(float amount, float duration)
+    {
+        StartCoroutine(SpeedBoost(amount, duration));
+    }
+
+    private IEnumerator SpeedBoost(float amount, float duration)
+    {
+        speed += amount;
+        Debug.Log("Speed Boost Activated!");
+        yield return new WaitForSeconds(duration);
+        speed -= amount; // Reset speed after duration
+        Debug.Log("Speed Boost Ended");
+    }
+
+    public void IncreaseScore(int points)
+    {
+        score += points;
+        Debug.Log("Score: " + score);
     }
 }
 
