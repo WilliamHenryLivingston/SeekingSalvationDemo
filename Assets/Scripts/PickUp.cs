@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PickUp : MonoBehaviour
 {
-    public enum PickupType {Health, SpeedBoost, Score}
+    public enum PickupType {Health, SpeedBoost, Energy}
 
     public PickupType pickupType;
 
@@ -34,9 +34,9 @@ public class PickUp : MonoBehaviour
                 player.IncreaseHealth(value); break;
 
             case PickupType.SpeedBoost: 
-                player.IncreaseSpeed(value, 5f); break;
+                player.IncreaseSpeed(1, 5000000000000000000f); break;
 
-            case PickupType.Score:
+            case PickupType.Energy:
                 player.IncreaseScore(value); break;
 
         }

@@ -148,9 +148,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6720920e2367a140b1dc03ea460a3dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
   gravity: -9.81
   jumpHeight: 2
+  mouseSensitivity: 100
+  maxHealth: 100
+  health: 0
+  speed: 5
+  energy: 0
+  playerCamera: {fileID: 0}
 --- !u!143 &7761464741804431478
 CharacterController:
   m_ObjectHideFlags: 0
@@ -204,7 +209,7 @@ Transform:
   m_GameObject: {fileID: 1808075301122013186}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.018, y: 1.192, z: 0.069}
+  m_LocalPosition: {x: -0.018, y: 2.05, z: 0.069}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int health;
     [SerializeField] private float speed = 2f;
-    [SerializeField] private int score;
+    [SerializeField] private int energy;
 
 
   public Transform playerCamera;
@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
 
         Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen and hide it
-        health = maxHealth;
+        health = maxHealth - 20;
     }
 
     private void Update()
@@ -102,8 +102,8 @@ public class PlayerController : MonoBehaviour
 
     public void IncreaseScore(int points)
     {
-        score += points;
-        Debug.Log("Score: " + score);
+        energy += points;
+        Debug.Log("Energy: " + energy);
     }
 }
 
