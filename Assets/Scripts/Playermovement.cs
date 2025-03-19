@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed = 2f;
     [SerializeField] private int energy;
 
+    [Header("Breadcrumb Settings")]
+    [SerializeField] private GameObject breadcrumbPrefab;
+    [SerializeField] private float breadcrumbDistance = 10f;
+
 
   public Transform playerCamera;
 
@@ -23,18 +28,23 @@ public class PlayerController : MonoBehaviour
     private Vector3 velocity;
     private float xRotation = 0f;
 
+    private Vector3 lastBreadcrumbPosition;
+
     private void Start()
     {
         controller = GetComponent<CharacterController>();
 
         Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen and hide it
         health = maxHealth - 20;
+
+        lastBreadcrumbPosition = transform.position;
     }
 
     private void Update()
     {
         Movement();
         MouseLook();
+        CheckBreadcrumbSpawn();
     }
 
     private void Movement()
@@ -75,6 +85,25 @@ public class PlayerController : MonoBehaviour
         //Rotate the camera and player
         playerCamera.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.Rotate(Vector3.up * mouseX);
+    }
+
+    private void CheckBreadcrumbSpawn()
+    {
+        if(breadcrumbPrefab == null) return; //Saftey valve 
+
+        float distanceTraveled = Vector3.Distance(transform.position, lastBreadcrumbPosition);
+
+        if (distanceTraveled >= breadcrumbDistance)
+        {
+            SpawnBreadcrumb();
+            lastBreadcrumbPosition = transform.position; //Update spawn position
+        }
+
+    }
+
+    private void SpawnBreadcrumb()
+    {
+        Instantiate(breadcrumbPrefab, transform.position, Quaternion.identity);
     }
     
     
