@@ -29,12 +29,13 @@ public class PlayerController : MonoBehaviour
     private float xRotation = 0f;
 
     private Vector3 lastBreadcrumbPosition;
+    private bool canLook = true; //Controls whether player can look around 
 
     private void Start()
     {
         controller = GetComponent<CharacterController>();
 
-        Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen and hide it
+        //Cursor.lockState = CursorLockMode.Locked; // Moved to another script
         health = maxHealth - 20;
 
         lastBreadcrumbPosition = transform.position;
@@ -43,7 +44,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         Movement();
-        MouseLook();
+        if (canLook) MouseLook(); // Camera can move only if canLook is true 
         CheckBreadcrumbSpawn();
     }
 
@@ -74,6 +75,8 @@ public class PlayerController : MonoBehaviour
 
     private void MouseLook()
     {
+        if (!canLook) return; //prevent camera movement if inventory is open
+        
         //mouse Input
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
@@ -133,6 +136,12 @@ public class PlayerController : MonoBehaviour
     {
         energy += points;
         Debug.Log("Energy: " + energy);
+    }
+    
+    //New method to enable/disable camera movement 
+    public void SetLookEnabled(bool enabled)
+    {
+        canLook = enabled;
     }
 }
 
