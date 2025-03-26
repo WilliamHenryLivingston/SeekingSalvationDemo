@@ -1,45 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static InventoryItem;
 
 public class PickUp : MonoBehaviour
 {
-    public enum PickupType {Health, SpeedBoost, Energy}
-
-    public PickupType pickupType;
-
-    [SerializeField] int value = 10;
+    public InventoryItem inventoryItem;
+    private bool isPlayerInRange = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if(other.CompareTag("Player"))
         {
-            PlayerController player = other.GetComponent<PlayerController>(); 
-
-            if (player != null)
-            {
-                ApplyEffect(player);
-
-                Destroy(gameObject);
-            }
+            Debug.Log("Player entered item trigger."); // Debug log
+            isPlayerInRange = true;
+            
         }
     }
 
-    private void ApplyEffect(PlayerController player)
+
+    private void OnTriggerExit(Collider other)
     {
-        switch (pickupType)
+        if(other.CompareTag("Player"))
         {
-
-            case PickupType.Health:
-                player.IncreaseHealth(value); break;
-
-            case PickupType.SpeedBoost: 
-                player.IncreaseSpeed(1, 5000000000000000000f); break;
-
-            case PickupType.Energy:
-                player.IncreaseScore(value); break;
-
+            Debug.Log("Player exited item trigger."); // Debug log
+            isPlayerInRange = false;
         }
     }
 
+    private void Update()
+    {
+        if(isPlayerInRange && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("E key pressed while near item."); // Debug log
+            PickUpItem();
+        }
+    }
+
+    void PickUpItem()
+    {
+        Debug.Log("Picked Up:" + inventoryItem.itemName);
+        PlayerInventory.instance.AddItem(inventoryItem);
+
+        Debug.Log("Destroying item: " + gameObject.name);
+
+        Destroy(gameObject);
+    }
 }
