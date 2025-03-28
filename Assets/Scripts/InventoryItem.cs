@@ -9,6 +9,6 @@ using UnityEngine;
     public class InventoryItem: ScriptableObject
     {
         public string itemName;
-        public Sprite icon;
+        public Sprite itemIcon;
     }
 

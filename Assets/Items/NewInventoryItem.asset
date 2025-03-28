@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: NewInventoryItem
   m_EditorClassIdentifier: 
   itemName: Energy
-  icon: {fileID: 21300000, guid: 38fd9688bbb61d04f9452d0b59a150a2, type: 3}
+  itemIcon: {fileID: 21300000, guid: 38fd9688bbb61d04f9452d0b59a150a2, type: 3}
