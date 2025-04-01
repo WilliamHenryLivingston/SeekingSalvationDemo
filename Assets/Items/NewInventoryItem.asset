@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Energy
   itemIcon: {fileID: 21300000, guid: 38fd9688bbb61d04f9452d0b59a150a2, type: 3}
+  itemPrefab: {fileID: 2045075875042987923, guid: 7f278e427fd34f348b129f883dc3c3a0, type: 3}

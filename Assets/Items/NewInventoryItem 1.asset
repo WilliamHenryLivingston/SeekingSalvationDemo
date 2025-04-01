@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: NewInventoryItem 1
   m_EditorClassIdentifier: 
   itemName: Speed
-  itemIcon: {fileID: 21300000, guid: ac0693ccd1f3c6d46ad8eebf425886cf, type: 3}
+  itemIcon: {fileID: 21300000, guid: 527e3254c1998bb4e83806bdc4192ca9, type: 3}
+  itemPrefab: {fileID: 3801154413272186534, guid: 33447324389230d4a8a17d1d595dbe25, type: 3}

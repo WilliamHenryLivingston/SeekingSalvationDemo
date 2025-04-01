@@ -8,7 +8,8 @@ using UnityEngine;
 
     public class InventoryItem: ScriptableObject
     {
-        public string itemName;
-        public Sprite itemIcon;
+    public string itemName = "New Item";
+    public Sprite itemIcon = null;
+    public GameObject itemPrefab = null;
     }
 

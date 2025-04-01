@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Health
   itemIcon: {fileID: 21300000, guid: 147b9c8bdb839844d85867348add7cbc, type: 3}
+  itemPrefab: {fileID: 540909718302671072, guid: f1b69e41a30feee4d94566bbd59fbb35, type: 3}
