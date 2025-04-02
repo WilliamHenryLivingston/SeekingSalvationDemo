@@ -60,9 +60,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5754084199372789682, guid: bb32fc1a1ef5c8e43843d6616a5aadb8, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4938963702170258515, guid: bb32fc1a1ef5c8e43843d6616a5aadb8, type: 3}
     - target: {fileID: 919132149155446097, guid: bb32fc1a1ef5c8e43843d6616a5aadb8, type: 3}
       propertyPath: m_Name
       value: Hex_Tall_16
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bb32fc1a1ef5c8e43843d6616a5aadb8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bb32fc1a1ef5c8e43843d6616a5aadb8, type: 3}
       propertyPath: m_StaticEditorFlags
