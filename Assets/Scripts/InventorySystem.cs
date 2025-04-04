@@ -15,6 +15,8 @@ public class PlayerInventory : MonoBehaviour
 
     private RectTransform inventoryPanelRect; // Store the RectTransform for bounds checking
 
+    public int maxInventorySize = 10;
+
     private void Awake()
     {
         if (instance == null)
@@ -36,27 +38,22 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    public void AddItem(InventoryItem item)
+    public bool AddItem(InventoryItem item)
     {
-        if (item == null) return;
+        if (item == null) return false;
 
-        // --- Optional: Stacking Logic ---
-        // if (item.isStackable) {
-        //     InventoryItem existingItem = inventoryItems.Find(i => i.itemName == item.itemName && i.currentStack < i.maxStack);
-        //     if (existingItem != null) {
-        //         existingItem.currentStack++;
-        //         UpdateItemStackUI(existingItem); // You'd need a method to update stack count text
-        //         Debug.Log(item.itemName + " stack increased.");
-        //         return; // Don't add a new slot if stacked
-        //     }
-        // }
-        // --- End Stacking Logic ---
-
+        if (inventoryItems.Count >= maxInventorySize)
+        {
+            Debug.LogWarning("Inventory is full Cannot pick up" + item.itemName);
+                return false;
+        }
         inventoryItems.Add(item);
         Debug.Log(item.itemName + " added to inventory.");
 
         //UpdateUI
         AddItemToUI(item);
+
+        return true;
     }
 
     private void AddItemToUI(InventoryItem item)
