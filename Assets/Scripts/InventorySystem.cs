@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 // Remove 'using static InventoryItem;' if InventoryItem is a class/ScriptableObject now
 
 public class PlayerInventory : MonoBehaviour
 {
-    public static PlayerInventory instance;
+    public static PlayerInventory Instance { get; private set; }
     public List<InventoryItem> inventoryItems = new List<InventoryItem>();
 
     public Transform inventoryUIParent;     // Assign your inventory panel (e.g., a Panel UI element)
@@ -19,9 +20,9 @@ public class PlayerInventory : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             // DontDestroyOnLoad(gameObject); // Optional: if your inventory persists between scenes
         }
         else
@@ -155,4 +156,23 @@ public class PlayerInventory : MonoBehaviour
             }
         }
     }
+    public bool HasItem(string itemName)
+    {
+        return inventoryItems.Any(item => item.itemName == itemName);
+    }
+
+    // Removes the first item matching a given name
+    public bool RemoveItemByName(string itemName)
+    {
+        var itemToRemove = inventoryItems.FirstOrDefault(item => item.itemName == itemName);
+        if (itemToRemove != null)
+        {
+            RemoveItem(itemToRemove); // Calls your existing RemoveItem method
+            return true;
+        }
+
+        Debug.LogWarning($"Tried to remove item '{itemName}' but it wasn't found in inventory.");
+        return false;
+    }
+
 }

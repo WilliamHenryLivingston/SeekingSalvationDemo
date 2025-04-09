@@ -126,7 +126,7 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         if (itemToDrop == null || itemToDrop.itemPrefab == null) return false;
 
-        bool removed = PlayerInventory.instance.inventoryItems.Remove(itemToDrop);
+        bool removed = PlayerInventory.Instance.inventoryItems.Remove(itemToDrop);
         if (!removed)
         {
             Debug.LogError($"Failed to remove '{itemToDrop.itemName}' from inventory.");
@@ -135,8 +135,8 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
         Debug.Log($"Dropping '{itemToDrop.itemName}' into world.");
 
-        Vector3 dropPosition = PlayerInventory.instance.transform.position +
-                               (PlayerInventory.instance.transform.forward * 1.5f) +
+        Vector3 dropPosition = PlayerInventory.Instance.transform.position +
+                               (PlayerInventory.Instance.transform.forward * 1.5f) +
                                (Vector3.up * 0.2f); // Initial small offset
 
         float checkRadius = 0.5f;

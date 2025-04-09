@@ -39,7 +39,7 @@ public class PickUp : MonoBehaviour
 
     void PickUpItem()
     {
-        if (inventoryItem == null || PlayerInventory.instance == null)
+        if (inventoryItem == null || PlayerInventory.Instance == null)
         {
             Debug.LogError("InventoryItem or PlayerInventory instance is missing.");
             return;
@@ -48,7 +48,7 @@ public class PickUp : MonoBehaviour
         Debug.Log("Attempting to pick up: " + inventoryItem.itemName);
 
         // Try to add the item to the inventory
-        bool added = PlayerInventory.instance.AddItem(inventoryItem);
+        bool added = PlayerInventory.Instance.AddItem(inventoryItem);
 
         if (added)
         {
