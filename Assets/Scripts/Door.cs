@@ -1,20 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    private Animator animator;
-
-    private void Awake()
+    public Animator newanimator;
+    public Animator animator;
+    private void Start()
     {
-        animator = GetComponent<Animator>();
-        if (animator == null)
-            Debug.LogError("Animator not found on Door!", this);    }
+        
+
+        
+    }
+
+    public void Update()
+    {
+        Debug.Log(newanimator == null);
+    }
 
     public void Unlock()
     {
         Debug.Log("The door is now open.");
-        animator.SetTrigger("Open"); // Make sure this trigger exists in your Animator
+        newanimator.SetTrigger("OpenDoor"); 
     }
 }

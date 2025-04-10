@@ -16,6 +16,10 @@ public class PickUp : MonoBehaviour
             isPlayerInRange = true;
 
         }
+        else if (other.CompareTag("PickUp"))
+        {
+            //transform.position += Vector3.up;
+        }
     }
 
 

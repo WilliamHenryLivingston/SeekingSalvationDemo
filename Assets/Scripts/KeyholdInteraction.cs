@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class KeyholeInteraction : MonoBehaviour
 {
-    public GameObject door; // Reference to the door to unlock
-    public int requiredShards = 3;
+    public DoorOpen door; 
+    public int requiredShards = 2;
     private int insertedShards = 0;
     private bool playerInRange = false;
 
@@ -42,7 +42,7 @@ public class KeyholeInteraction : MonoBehaviour
     void UnlockDoor()
     {
         Debug.Log("Door unlocked!");
-        
+        door.Unlock();
        
     }
 
