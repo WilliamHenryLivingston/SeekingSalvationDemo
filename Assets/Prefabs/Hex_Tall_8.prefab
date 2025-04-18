@@ -65,6 +65,10 @@ PrefabInstance:
       value: Hex_Tall_8
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c08e7b1edc3ea494394e4db433a9a0ac, type: 3}
+      propertyPath: m_TagString
+      value: Tiles
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c08e7b1edc3ea494394e4db433a9a0ac, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}

@@ -64,6 +64,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hex_Tall_16 2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: aad1d6a393aa240469985fa543a555f5, type: 3}
+      propertyPath: m_TagString
+      value: Tiles
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
