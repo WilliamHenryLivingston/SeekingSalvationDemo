@@ -155,7 +155,9 @@ MonoBehaviour:
   health: 0
   speed: 5
   energy: 0
-  playerCamera: {fileID: 0}
+  breadcrumbPrefab: {fileID: 2127819807984011301, guid: b56bd4982a689aa40bc5c4d8dc3d6810, type: 3}
+  breadcrumbDistance: 10
+  playerCamera: {fileID: 2593894709802907989}
 --- !u!143 &7761464741804431478
 CharacterController:
   m_ObjectHideFlags: 0

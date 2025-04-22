@@ -106,10 +106,24 @@ public class PlayerController : MonoBehaviour
 
     private void SpawnBreadcrumb()
     {
-        Instantiate(breadcrumbPrefab, transform.position, Quaternion.identity);
+        Vector3 rayOrigin = transform.position + Vector3.up * 0.5f; // Slightly above the feet
+        Ray ray = new Ray(rayOrigin, Vector3.down);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 5f))
+        {
+            // Spawn at the exact point the ray hits the ground
+            Instantiate(breadcrumbPrefab, hit.point, Quaternion.identity);
+        }
+        else
+        {
+            // Fallback: if ground is not detected, just drop it at player position
+            Instantiate(breadcrumbPrefab, transform.position, Quaternion.identity);
+            Debug.LogWarning("No ground detected below player for breadcrumb placement.");
+        }
     }
-    
-    
+
+
     //Pickup Handling Methods
     public void IncreaseHealth(int amount) 
     {

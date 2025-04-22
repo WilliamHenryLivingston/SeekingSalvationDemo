@@ -67,7 +67,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hiddenObject: {fileID: 6923695418831948553}
-  chargesNeeded: 10
+  chargesNeeded: 15
 --- !u!1 &6153010550229310059
 GameObject:
   m_ObjectHideFlags: 0
