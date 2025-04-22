@@ -7,6 +7,7 @@ TagManager:
   - PickUp
   - Checkpoint
   - Tiles
+  - Breadcrumb
   layers:
   - Default
   - TransparentFX

@@ -1,17 +1,14 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float mouseSensitivity = 100f;
 
     [Header("Player Stats")]
-
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int health;
     [SerializeField] private float speed = 2f;
@@ -21,52 +18,47 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject breadcrumbPrefab;
     [SerializeField] private float breadcrumbDistance = 10f;
 
+    public List<GameObject> breadcrumbsTrail = new List<GameObject>();
 
-  public Transform playerCamera;
+    public Transform playerCamera;
 
     private CharacterController controller;
     private Vector3 velocity;
     private float xRotation = 0f;
 
     private Vector3 lastBreadcrumbPosition;
-    private bool canLook = true; //Controls whether player can look around 
+    private bool canLook = true;
 
     private void Start()
     {
         controller = GetComponent<CharacterController>();
-
-        //Cursor.lockState = CursorLockMode.Locked; // Moved to another script
         health = maxHealth - 20;
-
         lastBreadcrumbPosition = transform.position;
     }
 
     private void Update()
     {
         Movement();
-        if (canLook) MouseLook(); // Camera can move only if canLook is true 
+        if (canLook) MouseLook();
         CheckBreadcrumbSpawn();
     }
 
     private void Movement()
     {
-        // Get input
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
-        // Move player
         Vector3 move = transform.right * horizontal + transform.forward * vertical;
         controller.Move(move * speed * Time.deltaTime);
 
-        // Apply gravity
         if (controller.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
+
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
-        // Jump
         if (Input.GetButtonDown("Jump") && controller.isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
@@ -75,60 +67,57 @@ public class PlayerController : MonoBehaviour
 
     private void MouseLook()
     {
-        if (!canLook) return; //prevent camera movement if inventory is open
-        
-        //mouse Input
+        if (!canLook) return;
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        //Adjust xRotation to rotate the camera down and up
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        //Rotate the camera and player
         playerCamera.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.Rotate(Vector3.up * mouseX);
     }
 
     private void CheckBreadcrumbSpawn()
     {
-        if(breadcrumbPrefab == null) return; //Saftey valve 
+        if (breadcrumbPrefab == null) return;
 
         float distanceTraveled = Vector3.Distance(transform.position, lastBreadcrumbPosition);
 
         if (distanceTraveled >= breadcrumbDistance)
         {
             SpawnBreadcrumb();
-            lastBreadcrumbPosition = transform.position; //Update spawn position
+            lastBreadcrumbPosition = transform.position;
         }
-
     }
 
     private void SpawnBreadcrumb()
     {
-        Vector3 rayOrigin = transform.position + Vector3.up * 0.5f; // Slightly above the feet
-        Ray ray = new Ray(rayOrigin, Vector3.down);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, 5f))
-        {
-            // Spawn at the exact point the ray hits the ground
-            Instantiate(breadcrumbPrefab, hit.point, Quaternion.identity);
-        }
-        else
-        {
-            // Fallback: if ground is not detected, just drop it at player position
-            Instantiate(breadcrumbPrefab, transform.position, Quaternion.identity);
-            Debug.LogWarning("No ground detected below player for breadcrumb placement.");
-        }
+        Vector3 spawnPos = GetGroundedPosition(transform.position);
+        GameObject breadcrumb = Instantiate(breadcrumbPrefab, spawnPos, Quaternion.identity);
+        breadcrumbsTrail.Add(breadcrumb);
     }
 
+    /// <summary>
+    /// Casts a ray downward to place the breadcrumb on the ground.
+    /// </summary>
+    private Vector3 GetGroundedPosition(Vector3 origin)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(origin + Vector3.up * 5f, Vector3.down, out hit, 10f))
+        {
+            return hit.point;
+        }
 
-    //Pickup Handling Methods
-    public void IncreaseHealth(int amount) 
+        // Fallback if nothing is hit
+        return origin;
+    }
+
+    public void IncreaseHealth(int amount)
     {
         health += amount;
-        health = Mathf.Clamp(health, 0, maxHealth); // Prevent overhealing
+        health = Mathf.Clamp(health, 0, maxHealth);
         Debug.Log("Health: " + health);
     }
 
@@ -142,7 +131,7 @@ public class PlayerController : MonoBehaviour
         speed += amount;
         Debug.Log("Speed Boost Activated!");
         yield return new WaitForSeconds(duration);
-        speed -= amount; // Reset speed after duration
+        speed -= amount;
         Debug.Log("Speed Boost Ended");
     }
 
@@ -151,11 +140,9 @@ public class PlayerController : MonoBehaviour
         energy += points;
         Debug.Log("Energy: " + energy);
     }
-    
-    //New method to enable/disable camera movement 
+
     public void SetLookEnabled(bool enabled)
     {
         canLook = enabled;
     }
 }
-
