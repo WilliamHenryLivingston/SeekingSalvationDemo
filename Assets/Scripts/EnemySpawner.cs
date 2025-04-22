@@ -1,14 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private PlayerController player;
-    [SerializeField] private int breadcrumbIndexToSpawnAt = 10;
-    [SerializeField] private float minSpawnTime = 50f;//300f; // 5 minutes
-    [SerializeField] private float maxSpawnTime = 75f;//420f; // 7 minutes
+    [SerializeField] private int breadcrumbsBehindPlayer = 10;
+    [SerializeField] private float minSpawnTime = 50f; // 5 minutes
+    [SerializeField] private float maxSpawnTime = 75f; // 7 minutes
 
     private bool enemySpawned = false;
 
@@ -22,16 +21,9 @@ public class EnemySpawner : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        if (player != null && player.breadcrumbsTrail.Count > breadcrumbIndexToSpawnAt)
+        if (player != null && player.breadcrumbsTrail.Count > breadcrumbsBehindPlayer)
         {
-            GameObject spawnPoint = player.breadcrumbsTrail[breadcrumbIndexToSpawnAt];
-
-            if (spawnPoint != null)
-            {
-                Instantiate(enemyPrefab, spawnPoint.transform.position, Quaternion.identity);
-                enemySpawned = true;
-                Debug.Log("Something has found your trail" + breadcrumbIndexToSpawnAt);
-            }
+            SpawnEnemyAtLastBreadcrumbOffset(breadcrumbsBehindPlayer);
         }
         else
         {
@@ -44,16 +36,38 @@ public class EnemySpawner : MonoBehaviour
     {
         while (!enemySpawned)
         {
-            if (player.breadcrumbsTrail.Count > breadcrumbIndexToSpawnAt)
+            if (player.breadcrumbsTrail.Count > breadcrumbsBehindPlayer)
             {
-                GameObject spawnPoint = player.breadcrumbsTrail[breadcrumbIndexToSpawnAt];
-                Instantiate(enemyPrefab, spawnPoint.transform.position, Quaternion.identity);
-                enemySpawned = true;
-                Debug.Log("Enemy spawned at breadcrumb " + breadcrumbIndexToSpawnAt + " after waiting.");
+                SpawnEnemyAtLastBreadcrumbOffset(breadcrumbsBehindPlayer);
                 break;
             }
 
             yield return new WaitForSeconds(5f); // Check every 5 seconds
+        }
+    }
+
+    private void SpawnEnemyAtLastBreadcrumbOffset(int offsetFromEnd)
+    {
+        int trailCount = player.breadcrumbsTrail.Count;
+        int spawnIndex = trailCount - offsetFromEnd;
+
+        // Ensure index is valid
+        if (spawnIndex < 0 || spawnIndex >= trailCount) return;
+
+        GameObject spawnPoint = player.breadcrumbsTrail[spawnIndex];
+
+        if (spawnPoint != null)
+        {
+            GameObject enemy = Instantiate(enemyPrefab, spawnPoint.transform.position, Quaternion.identity);
+
+            TrackerEnemy tracker = enemy.GetComponent<TrackerEnemy>();
+            if (tracker != null)
+            {
+                tracker.SetStartingIndex(spawnIndex + 1); // Follow from the next breadcrumb forward
+            }
+
+            enemySpawned = true;
+            Debug.Log("Something has caught your scent!");
         }
     }
 }
