@@ -57,4 +57,18 @@ public class TrackerEnemy : MonoBehaviour
             targetBreadcrumb = null;
         }
     }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            KillPlayer();
+        }
+    }
+
+    private void KillPlayer()
+    {
+        Debug.Log("Player caught by enemy!");
+        GameManager.Instance.GameOver();
+    }
 }

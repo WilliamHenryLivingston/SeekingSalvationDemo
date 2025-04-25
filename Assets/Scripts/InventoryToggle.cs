@@ -5,45 +5,54 @@ using UnityEngine;
 public class InventoryToggle : MonoBehaviour
 {
     public GameObject inventoryUI;
-    public PlayerController playerController; //Reference to PlayerController script
+    public PlayerController playerController; // Reference to PlayerController script
     private bool isInventoryOpen = false;
+
+    [HideInInspector] public bool disableToggle = false; // <- Add this
 
     void Start()
     {
         inventoryUI.SetActive(false);
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-
-
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
-        if(Input.GetKeyDown(KeyCode.LeftShift)) //when player presses shift
-        {
-            ToggleInventory();//Show/hide Inventory
-        }
+        if (disableToggle) return; // <- Block input if toggle is disabled
 
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            ToggleInventory();
+        }
     }
 
-    void ToggleInventory()
+    public void ShowInventoryUIOnly()
     {
-        isInventoryOpen = !isInventoryOpen; 
+        isInventoryOpen = true;
+        inventoryUI.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        if (playerController != null) playerController.SetLookEnabled(false);
+    }
+
+    private void ToggleInventory()
+    {
+        isInventoryOpen = !isInventoryOpen;
         inventoryUI.SetActive(isInventoryOpen);
 
-        if (isInventoryOpen )
+        if (isInventoryOpen)
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
-            if (playerController != null) playerController.SetLookEnabled(false);//Disable camera movement
+            if (playerController != null) playerController.SetLookEnabled(false);
         }
         else
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-            if (playerController != null) playerController.SetLookEnabled(true);//Enable camera movement
+            if (playerController != null) playerController.SetLookEnabled(true);
         }
     }
 }

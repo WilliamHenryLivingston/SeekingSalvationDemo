@@ -15,9 +15,10 @@ GameObject:
   - component: {fileID: 3476607469068891231}
   - component: {fileID: 5598301680500330555}
   - component: {fileID: 7761464741804431478}
+  - component: {fileID: 3066618201839986471}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -157,6 +158,7 @@ MonoBehaviour:
   energy: 0
   breadcrumbPrefab: {fileID: 2127819807984011301, guid: b56bd4982a689aa40bc5c4d8dc3d6810, type: 3}
   breadcrumbDistance: 10
+  breadcrumbsTrail: []
   playerCamera: {fileID: 2593894709802907989}
 --- !u!143 &7761464741804431478
 CharacterController:
@@ -184,6 +186,19 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3066618201839986471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 901194690730586310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27249dca44e75f44cbf6d6bfcd9b25df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fallThreshold: -20
 --- !u!1 &1808075301122013186
 GameObject:
   m_ObjectHideFlags: 0
