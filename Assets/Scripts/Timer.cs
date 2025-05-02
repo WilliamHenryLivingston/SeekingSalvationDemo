@@ -21,6 +21,13 @@ public class GameTimer : MonoBehaviour
         UpdateTimerUI(); // Initialize display
     }
 
+    public void ResetTimer()
+    {
+        timeRemaining = 600f; // Reset to full time (or make this configurable)
+        UpdateTimerUI();
+        Debug.Log("Timer reset by Divine Tree.");
+    }
+
     void Update()
     {
         if (timerIsRunning)

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public class TrackerEnemy : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class TrackerEnemy : MonoBehaviour
     private int currentBreadcrumbIndex = 0;
     private Transform targetBreadcrumb;
     private bool initialized = false;
+
+    public event Action OnDespawned;
 
     private void Start()
     {
@@ -70,5 +73,11 @@ public class TrackerEnemy : MonoBehaviour
     {
         Debug.Log("Player caught by enemy!");
         GameManager.Instance.GameOver();
+    }
+
+    public void OnDestroy()
+    {
+        OnDespawned?.Invoke();
+        Destroy(gameObject);
     }
 }
