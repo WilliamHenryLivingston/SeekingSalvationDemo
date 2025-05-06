@@ -3,45 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using static InventoryItem;
 
+[RequireComponent(typeof(Collider))]
 public class PickUp : MonoBehaviour
 {
     public InventoryItem inventoryItem;
     private bool isPlayerInRange = false;
+    private bool isPickedUp = false;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player entered item trigger."); // Debug log
             isPlayerInRange = true;
-
-        }
-        else if (other.CompareTag("PickUp"))
-        {
-            //transform.position += Vector3.up;
+            Debug.Log("Player entered item trigger.");
         }
     }
-
 
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player exited item trigger."); // Debug log
             isPlayerInRange = false;
+            Debug.Log("Player exited item trigger.");
         }
     }
 
     private void Update()
     {
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
+        if (isPlayerInRange && !isPickedUp && Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("E key pressed while near item."); // Debug log
+            Debug.Log("E key pressed while near item.");
             PickUpItem();
         }
     }
 
-    void PickUpItem()
+    private void PickUpItem()
     {
         if (inventoryItem == null || PlayerInventory.Instance == null)
         {
@@ -49,15 +45,21 @@ public class PickUp : MonoBehaviour
             return;
         }
 
-        Debug.Log("Attempting to pick up: " + inventoryItem.itemName);
-
-        // Try to add the item to the inventory
         bool added = PlayerInventory.Instance.AddItem(inventoryItem);
 
         if (added)
         {
+            isPickedUp = true;
             Debug.Log("Successfully picked up: " + inventoryItem.itemName);
-            Destroy(gameObject); // Only destroy if successfully added
+
+            // Optional: disable collider first to avoid repeat triggers before destruction
+            Collider col = GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+
+            // Optional: play pickup sound here
+            // AudioSource.PlayClipAtPoint(pickupSound, transform.position);
+
+            Destroy(gameObject); // Remove item from the scene
         }
         else
         {

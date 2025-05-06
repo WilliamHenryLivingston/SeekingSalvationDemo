@@ -4,15 +4,28 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private GameObject enemyPrefab;
-    [SerializeField] private PlayerController player;
+    [SerializeField] private PlayerBreadcrumbTrail player; // Updated reference
     [SerializeField] private int breadcrumbsBehindPlayer = 10;
-    [SerializeField] private float minSpawnTime = 50f; // 5 minutes
-    [SerializeField] private float maxSpawnTime = 75f; // 7 minutes
+    [SerializeField] private float minSpawnTime = 50f;
+    [SerializeField] private float maxSpawnTime = 75f;
 
     private GameObject currentEnemy;
 
     private void Start()
     {
+        // Automatically find the player and its breadcrumb trail script
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            player = playerObj.GetComponent<PlayerBreadcrumbTrail>();
+        }
+
+        if (player == null)
+        {
+            Debug.LogError("EnemySpawner: PlayerBreadcrumbTrail not found on player!");
+            return;
+        }
+
         ScheduleNextSpawn();
     }
 
@@ -26,9 +39,10 @@ public class EnemySpawner : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        while (player == null || player.breadcrumbsTrail.Count <= breadcrumbsBehindPlayer)
+        // Wait until enough breadcrumbs are available
+        while (player.breadcrumbsTrail.Count <= breadcrumbsBehindPlayer)
         {
-            yield return new WaitForSeconds(5f); // Wait for more breadcrumbs
+            yield return new WaitForSeconds(5f);
         }
 
         SpawnEnemyAtLastBreadcrumbOffset(breadcrumbsBehindPlayer);

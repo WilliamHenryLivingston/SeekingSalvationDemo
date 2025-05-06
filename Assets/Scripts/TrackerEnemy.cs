@@ -17,19 +17,28 @@ public class TrackerEnemy : MonoBehaviour
 
     private void Start()
     {
+        // Try to find the player and their breadcrumb trail
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
-            PlayerController playerController = player.GetComponent<PlayerController>();
-            if (playerController != null)
+            PlayerBreadcrumbTrail trail = player.GetComponent<PlayerBreadcrumbTrail>();
+            if (trail != null)
             {
-                breadcrumbTrail = playerController.breadcrumbsTrail;
+                breadcrumbTrail = trail.breadcrumbsTrail;
                 initialized = true;
             }
+            else
+            {
+                Debug.LogError("TrackerEnemy: PlayerBreadcrumbTrail not found on player.");
+            }
+        }
+        else
+        {
+            Debug.LogError("TrackerEnemy: Player with tag 'Player' not found.");
         }
     }
 
-    // This method allows you to start following breadcrumbs from a specific index
+    // Called by spawner to define where in the trail to start
     public void SetStartingIndex(int index)
     {
         currentBreadcrumbIndex = index;
@@ -40,19 +49,24 @@ public class TrackerEnemy : MonoBehaviour
         if (!initialized || breadcrumbTrail == null || breadcrumbTrail.Count == 0 || currentBreadcrumbIndex >= breadcrumbTrail.Count)
             return;
 
-        // Get the next valid breadcrumb to follow
         if (targetBreadcrumb == null)
         {
-            targetBreadcrumb = breadcrumbTrail[currentBreadcrumbIndex]?.transform;
+            // Skip null entries in the trail
+            while (currentBreadcrumbIndex < breadcrumbTrail.Count && breadcrumbTrail[currentBreadcrumbIndex] == null)
+            {
+                currentBreadcrumbIndex++;
+            }
+
+            if (currentBreadcrumbIndex < breadcrumbTrail.Count)
+                targetBreadcrumb = breadcrumbTrail[currentBreadcrumbIndex].transform;
         }
 
         if (targetBreadcrumb == null) return;
 
-        // Move toward the target breadcrumb
+        // Move toward the current breadcrumb
         Vector3 dir = (targetBreadcrumb.position - transform.position).normalized;
         transform.position += dir * moveSpeed * Time.deltaTime;
 
-        // Check if the enemy reached the breadcrumb
         float dist = Vector3.Distance(transform.position, targetBreadcrumb.position);
         if (dist <= reachDistance)
         {
@@ -75,9 +89,8 @@ public class TrackerEnemy : MonoBehaviour
         GameManager.Instance.GameOver();
     }
 
-    public void OnDestroy()
+    private void OnDestroy()
     {
         OnDespawned?.Invoke();
-        Destroy(gameObject);
     }
 }

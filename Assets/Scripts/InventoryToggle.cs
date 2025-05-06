@@ -5,10 +5,12 @@ using UnityEngine;
 public class InventoryToggle : MonoBehaviour
 {
     public GameObject inventoryUI;
-    public PlayerController playerController; // Reference to PlayerController script
+
+    // Replace this with your actual look-control component if needed
+    public MonoBehaviour lookControlScript;
     private bool isInventoryOpen = false;
 
-    [HideInInspector] public bool disableToggle = false; // <- Add this
+    [HideInInspector] public bool disableToggle = false;
 
     void Start()
     {
@@ -19,10 +21,12 @@ public class InventoryToggle : MonoBehaviour
 
     void Update()
     {
-        if (disableToggle) return; // <- Block input if toggle is disabled
+        Debug.Log("Update is being called");
+        if (disableToggle) return;
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
+            Debug.Log("Q key pressed");
             ToggleInventory();
         }
     }
@@ -34,7 +38,7 @@ public class InventoryToggle : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        if (playerController != null) playerController.SetLookEnabled(false);
+        SetLookEnabled(false);
     }
 
     private void ToggleInventory()
@@ -46,13 +50,29 @@ public class InventoryToggle : MonoBehaviour
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
-            if (playerController != null) playerController.SetLookEnabled(false);
+            SetLookEnabled(false);
         }
         else
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-            if (playerController != null) playerController.SetLookEnabled(true);
+            SetLookEnabled(true);
+        }
+    }
+
+    private void SetLookEnabled(bool enabled)
+    {
+        if (lookControlScript == null) return;
+
+        // Dynamically call SetLookEnabled(bool) if the component has it
+        var method = lookControlScript.GetType().GetMethod("SetLookEnabled");
+        if (method != null)
+        {
+            method.Invoke(lookControlScript, new object[] { enabled });
+        }
+        else
+        {
+            Debug.LogWarning("Look control script does not contain 'SetLookEnabled(bool)' method.");
         }
     }
 }
