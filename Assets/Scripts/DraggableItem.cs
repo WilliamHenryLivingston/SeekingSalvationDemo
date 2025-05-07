@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    public bool enableDragging = true;
     [HideInInspector] public InventoryItem item;
     [HideInInspector] public Image image;
     [HideInInspector] public Transform originalParent;
@@ -24,6 +25,7 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!enableDragging) return;
         if (item == null || image == null || image.sprite == null || !image.enabled)
         {
             eventData.pointerDrag = null;
@@ -46,6 +48,7 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!enableDragging) return;
         if (canvasGroup.blocksRaycasts) return;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -59,6 +62,7 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (!enableDragging) return;
         if (item == null) return;
 
         Debug.Log("End Drag: " + item.itemName);
@@ -76,20 +80,7 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
             if (outsideInventory)
             {
-                Debug.Log("Dropped outside inventory!");
-
-                // Try to drop the item in the world
-                bool droppedToWorld = DropItemToWorld(item);
-
-                if (droppedToWorld)
-                {
-                    Destroy(gameObject);
-                }
-                else
-                {
-                    Debug.Log("World drop failed, returning item.");
-                    ReturnToOriginalSlot();
-                }
+                ReturnToOriginalSlot();
             }
             else
             {

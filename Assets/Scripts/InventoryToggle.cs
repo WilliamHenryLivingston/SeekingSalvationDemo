@@ -48,7 +48,7 @@ public class InventoryToggle : MonoBehaviour
 
         if (isInventoryOpen)
         {
-            Cursor.visible = true;
+            //Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             SetLookEnabled(false);
         }
