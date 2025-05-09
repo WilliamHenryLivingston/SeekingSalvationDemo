@@ -12,6 +12,7 @@ public class FallDetector : MonoBehaviour
         {
             Debug.Log("Player fell off the map!");
             GameManager.Instance.GameOver();
+            Destroy(this);
         }
     }
 }

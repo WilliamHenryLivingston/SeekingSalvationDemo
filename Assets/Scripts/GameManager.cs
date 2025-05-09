@@ -17,12 +17,13 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void GameOver()
@@ -34,6 +35,8 @@ public class GameManager : MonoBehaviour
             inventoryToggle.disableToggle = true;
             inventoryToggle.ShowInventoryUIOnly();
         }
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 
         gameOverUI.SetActive(true);
     }

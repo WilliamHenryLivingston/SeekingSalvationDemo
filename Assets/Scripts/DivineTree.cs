@@ -21,7 +21,7 @@ public class DivineTree : MonoBehaviour
             GameObject enemy = GameObject.FindWithTag("Enemy");
             if (enemy != null)
             {
-                Destroy(enemy);
+                enemy.GetComponent<TrackerEnemy>().Despawn();
                 Debug.Log("Something has lost your scent");
             }
         }

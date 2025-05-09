@@ -16,6 +16,7 @@ namespace AtrillionGamesLtd
         [Space]
         // These are visible in the editor to help debug
         [Header("Debug Fields")]
+        [SerializeField] private LayerMask floorlayers;
         [SerializeField] private Vector3 playerVelocity;
         [SerializeField] private Vector3 prevPlayerPos;
         [SerializeField] private Vector3 absolutePlayerVelocity;
@@ -277,7 +278,7 @@ namespace AtrillionGamesLtd
             isGrounded = false;
             RaycastHit directlyGrounded;
             Debug.DrawRay(transform.position, gravityDirection * playerStandingHeight, Color.cyan, 5f);
-            if (Physics.Raycast(transform.position, gravityDirection, out directlyGrounded, (headOffset/2)+stepHeight+0.01f))
+            if (Physics.Raycast(transform.position, gravityDirection, out directlyGrounded, (headOffset/2)+stepHeight+0.01f, floorlayers))
             {
                 isGrounded = true;
                 standingOnMovingSurface(directlyGrounded.collider.transform, directlyGrounded.point);

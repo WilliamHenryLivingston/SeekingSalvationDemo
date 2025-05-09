@@ -89,8 +89,11 @@ public class TrackerEnemy : MonoBehaviour
         GameManager.Instance.GameOver();
     }
 
-    private void OnDestroy()
+    public void Despawn()
     {
         OnDespawned?.Invoke();
+        Destroy(gameObject);
     }
+
+
 }
