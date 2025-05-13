@@ -8,9 +8,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7863067850302894962, guid: 33447324389230d4a8a17d1d595dbe25, type: 3}
+      propertyPath: m_Center.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7863067850302894962, guid: 33447324389230d4a8a17d1d595dbe25, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2201744503539366769, guid: 33447324389230d4a8a17d1d595dbe25, type: 3}
+      propertyPath: m_Radius
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2201744503539366769, guid: 33447324389230d4a8a17d1d595dbe25, type: 3}
+      propertyPath: m_Center.y
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 3801154413272186534, guid: 33447324389230d4a8a17d1d595dbe25, type: 3}
       propertyPath: m_Name
-      value: Speed_Boost Variant
+      value: Energy
       objectReference: {fileID: 0}
     - target: {fileID: 4473050206644097736, guid: 33447324389230d4a8a17d1d595dbe25, type: 3}
       propertyPath: m_LocalPosition.x

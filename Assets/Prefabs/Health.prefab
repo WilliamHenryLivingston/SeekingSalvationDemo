@@ -60,6 +60,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 5ec6ca2eb627222439361f19b5504bed, type: 2}
+    - target: {fileID: 8540910179476611975, guid: c8971bd5333f458498a5cd6910798dbc, type: 3}
+      propertyPath: m_Radius
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540910179476611975, guid: c8971bd5333f458498a5cd6910798dbc, type: 3}
+      propertyPath: m_Center.y
+      value: 1.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
