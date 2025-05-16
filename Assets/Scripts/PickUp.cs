@@ -24,7 +24,7 @@ public class PickUp : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInRange = false;
-            Debug.Log("Player exited item trigger.");
+            
         }
     }
 
@@ -32,7 +32,7 @@ public class PickUp : MonoBehaviour
     {
         if (isPlayerInRange && !isPickedUp && Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("E key pressed while near item.");
+           
             PickUpItem();
         }
     }

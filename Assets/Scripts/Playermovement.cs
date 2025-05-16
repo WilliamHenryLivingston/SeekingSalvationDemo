@@ -4,15 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float gravity = -9.81f;
-    [SerializeField] private float jumpHeight = 2f;
-    [SerializeField] private float mouseSensitivity = 100f;
 
-    [Header("Player Stats")]
-    [SerializeField] private int maxHealth = 100;
-    [SerializeField] private int health;
-    [SerializeField] private float speed = 2f;
-    [SerializeField] private int energy;
+    private Vector2 lastBreadcrumbXZ;
+
 
     [Header("Breadcrumb Settings")]
     [SerializeField] private GameObject breadcrumbPrefab;
@@ -22,90 +16,56 @@ public class PlayerController : MonoBehaviour
 
     public Transform playerCamera;
 
-    private CharacterController controller;
-    private Vector3 velocity;
-    private float xRotation = 0f;
 
-    private Vector3 lastBreadcrumbPosition;
+
     private bool canLook = true;
 
     private void Start()
     {
-        controller = GetComponent<CharacterController>();
-        health = maxHealth - 20;
-        lastBreadcrumbPosition = transform.position;
+      
+        lastBreadcrumbXZ = new Vector2(transform.position.x, transform.position.z);
     }
 
     private void Update()
     {
-        Movement();
-        if (canLook) MouseLook();
+        //Debug.Log("Update() is running");
+
         CheckBreadcrumbSpawn();
     }
 
-    private void Movement()
-    {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        Vector3 move = transform.right * horizontal + transform.forward * vertical;
-        controller.Move(move * speed * Time.deltaTime);
-
-        if (controller.isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f;
-        }
-
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
-
-        if (Input.GetButtonDown("Jump") && controller.isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
-    }
-
-    private void MouseLook()
-    {
-        if (!canLook) return;
-
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-
-        playerCamera.localRotation = Quaternion.Euler(xRotation, 0, 0);
-        transform.Rotate(Vector3.up * mouseX);
-    }
 
     private void CheckBreadcrumbSpawn()
     {
+        //Debug.Log("CheckBreadcrumbSpawn() is running.");
+
         if (breadcrumbPrefab == null) return;
 
-        float distanceTraveled = Vector3.Distance(transform.position, lastBreadcrumbPosition);
+        Vector2 currentXZ = new Vector2(transform.position.x, transform.position.z);
+        float horizontalDistance = Vector2.Distance(currentXZ, lastBreadcrumbXZ);
 
-        if (distanceTraveled >= breadcrumbDistance)
+        //Debug.Log($"[Breadcrumb Debug] XZ Distance: {horizontalDistance:F2} | Current: {currentXZ} | Last: {lastBreadcrumbXZ}");
+
+        if (horizontalDistance >= breadcrumbDistance)
         {
+            //Debug.Log("Spawning Breadcrumb...");
             SpawnBreadcrumb();
-            lastBreadcrumbPosition = transform.position;
+            lastBreadcrumbXZ = currentXZ;
         }
     }
-
     private void SpawnBreadcrumb()
     {
-        Vector3 spawnPos = GetGroundedPosition(transform.position);
+        // Force Y to be a fixed high point for raycast — NOT player's Y
+        Vector3 breadcrumbXZ = new Vector3(transform.position.x, 100f, transform.position.z);
+
+        // Raycast down to find the ground
+        Vector3 spawnPos = GetGroundedPosition(breadcrumbXZ);
+
         GameObject breadcrumb = Instantiate(breadcrumbPrefab, spawnPos, Quaternion.identity);
         breadcrumbsTrail.Add(breadcrumb);
     }
-
-    /// <summary>
-    /// Casts a ray downward to place the breadcrumb on the ground.
-    /// </summary>
     private Vector3 GetGroundedPosition(Vector3 origin)
     {
-        RaycastHit hit;
-        if (Physics.Raycast(origin + Vector3.up * 5f, Vector3.down, out hit, 10f))
+        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 200f))
         {
             return hit.point;
         }
@@ -114,32 +74,8 @@ public class PlayerController : MonoBehaviour
         return origin;
     }
 
-    public void IncreaseHealth(int amount)
-    {
-        health += amount;
-        health = Mathf.Clamp(health, 0, maxHealth);
-        Debug.Log("Health: " + health);
-    }
 
-    public void IncreaseSpeed(float amount, float duration)
-    {
-        StartCoroutine(SpeedBoost(amount, duration));
-    }
 
-    private IEnumerator SpeedBoost(float amount, float duration)
-    {
-        speed += amount;
-        Debug.Log("Speed Boost Activated!");
-        yield return new WaitForSeconds(duration);
-        speed -= amount;
-        Debug.Log("Speed Boost Ended");
-    }
-
-    public void IncreaseScore(int points)
-    {
-        energy += points;
-        Debug.Log("Energy: " + energy);
-    }
 
     public void SetLookEnabled(bool enabled)
     {

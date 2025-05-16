@@ -21,12 +21,12 @@ public class InventoryToggle : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("Update is being called");
+        
         if (disableToggle) return;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Debug.Log("Q key pressed");
+            
             ToggleInventory();
         }
     }
