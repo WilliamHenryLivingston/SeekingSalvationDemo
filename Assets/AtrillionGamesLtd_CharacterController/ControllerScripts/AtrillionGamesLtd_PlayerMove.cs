@@ -65,6 +65,21 @@ namespace AtrillionGamesLtd
         [SerializeField] private float playerWallRunJumpPower = 10f;
         [Space]
 
+        [Header("Stamina Settings")]
+        [SerializeField] private float maxStamina = 1000f;
+        [SerializeField] private float currentStamina;
+        [SerializeField] private float staminaRegenRate = 25f;
+        [SerializeField] private float sprintStaminaCostPerSecond = 15f;
+        [SerializeField] private float jumpStaminaCost = 10f;
+        [SerializeField] private float wallRunStaminaCostPerSecond = 20f;
+        [SerializeField] private float slideStaminaCost = 10f;
+        [Space]
+
+        [SerializeField] private StaminaUI staminaUI;
+
+        private bool canPerformActions = true;
+        [Space]
+
         private float pointInWallRun = 0f;
         private float groundFriction = 0f;
         private Vector3 slopeNormal;
@@ -79,6 +94,7 @@ namespace AtrillionGamesLtd
 
         void Awake()
         {
+            currentStamina = maxStamina;
             inputActions = new ATG_PlayerControls();
         }
 
@@ -361,11 +377,20 @@ namespace AtrillionGamesLtd
             }
         }
 
-        void handleSprinting(ref float playerMovementSpeed){
-            // add sprint speed boost
-            if (isSprinting && isGrounded && !isCrouching) // only give sprint speed boost when standing on the ground
+        void handleSprinting(ref float playerMovementSpeed)
+        {
+            // Only sprint if grounded, not crouching, and stamina is sufficient
+            if (isSprinting && isGrounded && !isCrouching && currentStamina >= sprintStaminaCostPerSecond * Time.deltaTime)
             {
                 playerMovementSpeed *= sprintSpeedMultiplier;
+
+                // Drain stamina for sprinting
+                DrainStamina(sprintStaminaCostPerSecond * Time.deltaTime);
+            }
+            else
+            {
+                // Not enough stamina — prevent sprinting
+                isSprinting = false;
             }
         }
 
@@ -384,12 +409,26 @@ namespace AtrillionGamesLtd
                     Debug.DrawRay(transform.position, move, Color.cyan, 5f);
                 }
             }
-            else if(isWallRunning){
-                float wallRunControl = playerWallRunControl * Mathf.Clamp01(1-pointInWallRun*playerWallRunFallOff) * Mathf.Clamp01(Vector3.Dot(playerVelocity.normalized, move));
-                playerVelocity += move * playerMovementSpeed * wallRunControl * Time.fixedDeltaTime;
-                playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime; // Add gravity
+            else if (isWallRunning)
+            {
+                // Check if enough stamina to continue wall running
+                if (currentStamina >= wallRunStaminaCostPerSecond * Time.fixedDeltaTime)
+                {
+                    // Drain stamina for wall running
+                    DrainStamina(wallRunStaminaCostPerSecond * Time.fixedDeltaTime);
+
+                    float wallRunControl = playerWallRunControl * Mathf.Clamp01(1 - pointInWallRun * playerWallRunFallOff) * Mathf.Clamp01(Vector3.Dot(playerVelocity.normalized, move));
+                    playerVelocity += move * playerMovementSpeed * wallRunControl * Time.fixedDeltaTime;
+                    playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime; // Add gravity
+                }
+                else
+                {
+                    // Not enough stamina — exit wall run
+                    isWallRunning = false;
+                }
             }
-            else{ // If the player isn't touching the ground then their movement is dictated by the air control amount
+            else
+            { // If the player isn't touching the ground then their movement is dictated by the air control amount
                 playerVelocity += move * playerMovementSpeed * playerAirControl * Time.fixedDeltaTime;
                 playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime; // Add gravity
                 playerVelocity *= 1f - playerAirResistance; // Add Air Resistance
@@ -407,29 +446,52 @@ namespace AtrillionGamesLtd
             }
         }
 
-        void handleJumping(){
-            // Jumping logic
-            if (isJumping && !isJumpDisabled && (isGrounded || isWallRunning) && !isCrouching) // Player jumps if they are on the ground and are not crouching (and jumping is enabled)
+        void handleJumping()
+        {
+            // Only allow jumping if stamina is available
+            if (isJumping && !isJumpDisabled && (isGrounded || isWallRunning) && !isCrouching && canPerformActions)
             {
-                if(isWallRunning){
-                    playerVelocity += (slopeNormal + transform.up)/2 * playerWallRunJumpPower; // Apply upward velocity for jumping
-                }else{
-                    playerVelocity += (slopeNormal + transform.up)/2 * jumpHeight; // Apply upward velocity for jumping
+                // Drain stamina for jump
+                DrainStamina(jumpStaminaCost);
+
+                if (isWallRunning)
+                {
+                    playerVelocity += (slopeNormal + transform.up) / 2 * playerWallRunJumpPower;
                 }
+                else
+                {
+                    playerVelocity += (slopeNormal + transform.up) / 2 * jumpHeight;
+                }
+
                 isJumpDisabled = true;
                 isGrounded = false;
             }
-            
-            if (!isJumping){ // re-enable jumping once the player stops holding down the jump key (used to stop the player from jumping right after vaulting or climbing over ledges)
+
+            // Re-enable jump if jump key is released
+            if (!isJumping)
+            {
                 isJumpDisabled = false;
             }
         }
 
-        void handleSliding(Vector3 slideDirection, float groundFriction){
+        void handleSliding(Vector3 slideDirection, float groundFriction)
+        {
             if (isSliding)
             {
-                playerVelocity += slideDirection * gravityValue * Time.fixedDeltaTime; // Add force downhill if there is slope (otherwise the slide direction will be Vector3.zero)
-                playerVelocity -= playerVelocity * groundFriction * Time.fixedDeltaTime; // Apply some friction to sliding
+                // Optional: drain only once at slide start — you’d put this in the slide activation logic instead
+                if (currentStamina >= slideStaminaCost)
+                {
+                    // Drain stamina only once — recommended to move this where sliding starts
+                    DrainStamina(slideStaminaCost);
+
+                    playerVelocity += slideDirection * gravityValue * Time.fixedDeltaTime;
+                    playerVelocity -= playerVelocity * groundFriction * Time.fixedDeltaTime;
+                }
+                else
+                {
+                    // Not enough stamina — cancel slide
+                    isSliding = false;
+                }
             }
         }
 
@@ -532,11 +594,45 @@ namespace AtrillionGamesLtd
             playerLookAround();
             //playerInputs(); // uncomment this to use the old input system and
             GetPlayerInputs(); // comment this out
+            HandleStamina();
         }
 
         void FixedUpdate()
         {
             playerMove();
+        }
+
+        private void HandleStamina()
+        {
+            
+            // Regenerate stamina when not performing stamina-costing actions
+            if (!isSprinting && !isWallRunning)
+            {
+                currentStamina += staminaRegenRate * Time.deltaTime;
+                currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+            }
+
+            // Sprint stamina cost
+            if (isSprinting)
+            {
+                DrainStamina(sprintStaminaCostPerSecond * Time.deltaTime);
+            }
+
+            // Wall run stamina cost
+            if (isWallRunning)
+            {
+                DrainStamina(wallRunStaminaCostPerSecond * Time.deltaTime);
+            }
+
+            // Check if stamina is depleted
+            canPerformActions = currentStamina > 0;
+
+            staminaUI.UpdateStaminaBar(currentStamina, maxStamina);
+        }
+        private void DrainStamina(float amount)
+        {
+            currentStamina -= amount;
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
         }
     }
 }

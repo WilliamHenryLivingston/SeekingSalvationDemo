@@ -52,9 +52,17 @@ PrefabInstance:
       propertyPath: hiddenObject
       value: 
       objectReference: {fileID: 6923695418831948553}
+    - target: {fileID: 3964512353458189972, guid: ddca584646dede34487384b3fbeac75b, type: 3}
+      propertyPath: chargesNeeded
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 5146877935957497153, guid: ddca584646dede34487384b3fbeac75b, type: 3}
       propertyPath: m_Name
       value: Energy_Trigger_Box
+      objectReference: {fileID: 0}
+    - target: {fileID: 5146877935957497153, guid: ddca584646dede34487384b3fbeac75b, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7378852790484427470, guid: ddca584646dede34487384b3fbeac75b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -360,6 +368,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TimerResetTrigger
       objectReference: {fileID: 0}
+    - target: {fileID: 6764124798724643540, guid: 7d5c15ff00023f2449d0aabbdeabf163, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -603,15 +615,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4472785931765041771, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 9.764389
+      value: 9.5541525
       objectReference: {fileID: 0}
     - target: {fileID: 4472785931765041771, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_LocalScale.y
-      value: 9.764389
+      value: 9.5541525
       objectReference: {fileID: 0}
     - target: {fileID: 4472785931765041771, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_LocalScale.z
-      value: 9.764389
+      value: 9.5541525
       objectReference: {fileID: 0}
     - target: {fileID: 4472785931765041771, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -619,7 +631,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4472785931765041771, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -19.357
+      value: -19.23
       objectReference: {fileID: 0}
     - target: {fileID: 4472785931765041771, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_LocalPosition.z
