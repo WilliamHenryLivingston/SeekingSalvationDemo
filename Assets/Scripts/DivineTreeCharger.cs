@@ -11,6 +11,10 @@ public class DivineTreeCharger : MonoBehaviour
     private bool playerInRange = false;
     private GameObject player;
 
+    public DivineTreeCharger nextTree;
+
+    public Animator treeAnimator;
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -57,10 +61,23 @@ public class DivineTreeCharger : MonoBehaviour
             Debug.Log("You need energy to power the tree.");
         }
     }
-
     void ActivateTree()
     {
         Debug.Log("Divine Tree fully powered!");
+
+        // Tell the next tree to grow
+        if (nextTree != null && nextTree.treeAnimator != null)
+        {
+            nextTree.treeAnimator.SetTrigger("Grow");
+        }
+
+        // Reveal the shining path
+        if (hiddenObject != null)
+            hiddenObject.SetActive(true);
+    }
+    IEnumerator RevealAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         if (hiddenObject != null)
             hiddenObject.SetActive(true);
     }
