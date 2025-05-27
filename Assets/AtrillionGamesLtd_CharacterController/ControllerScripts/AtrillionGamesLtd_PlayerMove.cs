@@ -448,23 +448,30 @@ namespace AtrillionGamesLtd
 
         void handleJumping()
         {
-            // Only allow jumping if stamina is available
-            if (isJumping && !isJumpDisabled && (isGrounded || isWallRunning) && !isCrouching && canPerformActions)
             {
-                // Drain stamina for jump
-                DrainStamina(jumpStaminaCost);
+                if (!canPerformActions || isJumpDisabled || isCrouching)
+                    return;
 
-                if (isWallRunning)
+                if (isJumping)
                 {
-                    playerVelocity += (slopeNormal + transform.up) / 2 * playerWallRunJumpPower;
-                }
-                else
-                {
-                    playerVelocity += (slopeNormal + transform.up) / 2 * jumpHeight;
-                }
+                    // Ground Jump
+                    if (isGrounded)
+                    {
+                        DrainStamina(jumpStaminaCost);
+                        playerVelocity += (slopeNormal + transform.up).normalized * jumpHeight;
+                        isJumpDisabled = true;
+                        isGrounded = false;
+                    }
+                    // Wall Jump (only if not grounded)
+                    else if (isWallRunning && !isGrounded)
+                    {
+                        DrainStamina(jumpStaminaCost);
+                        playerVelocity += (slopeNormal + transform.up).normalized * playerWallRunJumpPower;
+                        isJumpDisabled = true;
+                    }
 
-                isJumpDisabled = true;
-                isGrounded = false;
+                    isJumping = false; // Reset this flag here to avoid one-time lockout
+                }
             }
 
             // Re-enable jump if jump key is released

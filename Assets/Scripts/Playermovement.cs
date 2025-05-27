@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
 
     private Vector2 lastBreadcrumbXZ;
+    [SerializeField] private LayerMask breadcrumbLayer;
 
 
     [Header("Breadcrumb Settings")]
@@ -34,32 +35,29 @@ public class PlayerController : MonoBehaviour
     }
 
 
+
+
     private void CheckBreadcrumbSpawn()
     {
-        //Debug.Log("CheckBreadcrumbSpawn() is running.");
-
         if (breadcrumbPrefab == null) return;
 
-        Vector2 currentXZ = new Vector2(transform.position.x, transform.position.z);
-        float horizontalDistance = Vector2.Distance(currentXZ, lastBreadcrumbXZ);
+        Vector3 origin = transform.position + Vector3.up * 0.1f; // Slight offset to avoid clipping
+        Vector3 spawnPos = GetGroundedPosition(origin);
 
-        //Debug.Log($"[Breadcrumb Debug] XZ Distance: {horizontalDistance:F2} | Current: {currentXZ} | Last: {lastBreadcrumbXZ}");
-
-        if (horizontalDistance >= breadcrumbDistance)
+        // Compare to last breadcrumb's position
+        if (breadcrumbsTrail.Count > 0)
         {
-            //Debug.Log("Spawning Breadcrumb...");
-            SpawnBreadcrumb();
-            lastBreadcrumbXZ = currentXZ;
+            Vector3 lastPos = breadcrumbsTrail[breadcrumbsTrail.Count - 1].transform.position;
+            float distance = Vector3.Distance(new Vector3(spawnPos.x, 0, spawnPos.z), new Vector3(lastPos.x, 0, lastPos.z));
+
+            if (distance < breadcrumbDistance)
+                return; // Too close — skip spawn
         }
+
+        SpawnBreadcrumb(spawnPos);
     }
-    private void SpawnBreadcrumb()
+    private void SpawnBreadcrumb(Vector3 spawnPos)
     {
-        // Force Y to be a fixed high point for raycast — NOT player's Y
-        Vector3 breadcrumbXZ = new Vector3(transform.position.x, 100f, transform.position.z);
-
-        // Raycast down to find the ground
-        Vector3 spawnPos = GetGroundedPosition(breadcrumbXZ);
-
         GameObject breadcrumb = Instantiate(breadcrumbPrefab, spawnPos, Quaternion.identity);
         breadcrumbsTrail.Add(breadcrumb);
     }
