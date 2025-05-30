@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     public Transform playerCamera;
 
-
+    public AudioClip spawnSound;
 
     private bool canLook = true;
 
@@ -25,6 +25,11 @@ public class PlayerController : MonoBehaviour
     {
       
         lastBreadcrumbXZ = new Vector2(transform.position.x, transform.position.z);
+        AudioSource audio = GetComponent<AudioSource>();
+        if (audio != null && spawnSound != null)
+        {
+            audio.PlayOneShot(spawnSound);
+        }
     }
 
     private void Update()
