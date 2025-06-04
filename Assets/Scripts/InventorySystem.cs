@@ -9,6 +9,8 @@ public class PlayerInventory : MonoBehaviour
 {
     public static PlayerInventory Instance { get; private set; }
     public List<InventoryItem> inventoryItems = new List<InventoryItem>();
+    public int currency = 0;
+    public int coins = 0;
 
     public Transform inventoryUIParent;     // Assign your inventory panel (e.g., a Panel UI element)
     public GameObject inventorySlotPrefab;

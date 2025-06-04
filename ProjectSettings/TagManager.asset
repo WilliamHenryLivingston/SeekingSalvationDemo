@@ -9,6 +9,8 @@ TagManager:
   - Tiles
   - Breadcrumb
   - Enemy
+  - DropZone
+  - CurrencyDropZone
   layers:
   - Default
   - TransparentFX
@@ -19,7 +21,7 @@ TagManager:
   - Dropped Item
   - Items
   - Player
-  - 
+  - Interactable
   - 
   - 
   - 
