@@ -142,6 +142,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 0}
   playerCameraHolder: {fileID: 0}
+  floorlayers:
+    serializedVersion: 2
+    m_Bits: 0
   playerVelocity: {x: 0, y: 0, z: 0}
   prevPlayerPos: {x: 0, y: 0, z: 0}
   absolutePlayerVelocity: {x: 0, y: 0, z: 0}
@@ -166,6 +169,7 @@ MonoBehaviour:
   crouchSpeedMultiplier: 0.5
   jumpHeight: 5
   stepHeight: 1
+  stairAndStepClimbRate: 10
   rotateTowardsGravityRate: 10
   gravityValue: 9.81
   gravityDirection: {x: 0, y: -1, z: 0}
@@ -176,6 +180,14 @@ MonoBehaviour:
   playerWallRunControl: 5
   playerWallRunFallOff: 2
   playerWallRunJumpPower: 10
+  maxStamina: 1000
+  currentStamina: 0
+  staminaRegenRate: 25
+  sprintStaminaCostPerSecond: 15
+  jumpStaminaCost: 10
+  wallRunStaminaCostPerSecond: 20
+  slideStaminaCost: 10
+  staminaUI: {fileID: 0}
 --- !u!136 &79816979919284130
 CapsuleCollider:
   m_ObjectHideFlags: 0
