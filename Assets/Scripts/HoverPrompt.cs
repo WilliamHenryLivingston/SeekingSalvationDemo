@@ -8,11 +8,9 @@ public class CurrencyHoverPrompt : MonoBehaviour
 {
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private GameObject uiPrompt;
-    [SerializeField] private TMP_Text promptText;
-    [SerializeField] private string message = "Press E to place currency";
+    [SerializeField] private TMP_Text promptText; // You can keep this if you want a shared prompt text object
 
-    private GameObject currentTarget;
+    private CurrencyDropZone lastZone = null;
 
     void Update()
     {
@@ -23,22 +21,41 @@ public class CurrencyHoverPrompt : MonoBehaviour
         {
             if (hit.collider.CompareTag("CurrencyDropZone"))
             {
-                currentTarget = hit.collider.gameObject;
-                uiPrompt.SetActive(true);
-                Debug.Log("Hovering over drop zone");
-                promptText.text = message;
-
-                if (Input.GetKeyDown(KeyCode.E))
+                CurrencyDropZone zone = hit.collider.GetComponent<CurrencyDropZone>();
+                if (zone != null)
                 {
-                    var dropZone = currentTarget.GetComponent<CurrencyDropZone>();
-                    dropZone?.TryPlaceCurrency();
+                    // Show this zone's prompt
+                    zone.ShowPrompt(true);
+
+                    // Hide the previous one if different
+                    if (lastZone != null && lastZone != zone)
+                    {
+                        lastZone.ShowPrompt(false);
+                    }
+
+                    lastZone = zone;
+
+                    // Update shared prompt text if you want, otherwise each drop zone sets its own text
+                    if (promptText != null)
+                    {
+                        promptText.text = "Press E to place currency";
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        zone.TryPlaceCurrency();
+                    }
+
+                    return;
                 }
-                return;
             }
         }
 
-        // Hide prompt when not hovering
-        currentTarget = null;
-        uiPrompt.SetActive(false);
+        // No hit or not a drop zone — hide last prompt
+        if (lastZone != null)
+        {
+            lastZone.ShowPrompt(false);
+            lastZone = null;
+        }
     }
 }

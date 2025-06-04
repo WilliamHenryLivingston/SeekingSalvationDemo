@@ -396,7 +396,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1137f78f38f1f11448984b158e901c07, type: 3}
       propertyPath: m_TagString
-      value: DropZone
+      value: CurrencyDropZone
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -529,7 +529,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1137f78f38f1f11448984b158e901c07, type: 3}
       propertyPath: m_TagString
-      value: DropZone
+      value: CurrencyDropZone
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

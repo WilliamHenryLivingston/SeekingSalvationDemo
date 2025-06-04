@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class CurrencyDropZone : MonoBehaviour
 {
-    [SerializeField] private GameObject uiPrompt; //  This makes it visible in Inspector
+    [SerializeField] private GameObject uiPrompt; // Reference to the worldspace UI prompt
     [SerializeField] private string promptText = "Press E to place currency";
     [SerializeField] private int cost = 1;
 
@@ -16,8 +16,7 @@ public class CurrencyDropZone : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
-            uiPrompt.SetActive(true);
-            uiPrompt.GetComponentInChildren<Text>().text = promptText;
+            ShowPrompt(true);
         }
     }
 
@@ -26,21 +25,7 @@ public class CurrencyDropZone : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            uiPrompt.SetActive(false);
-        }
-    }
-    public void TryPlaceCurrency()
-    {
-        PlayerInventory inventory = FindObjectOfType<PlayerInventory>();
-        if (inventory != null && inventory.coins >= 1)
-        {
-            inventory.coins -= 1;
-            Debug.Log("Currency placed!");
-            // Trigger upgrade or visual effect here
-        }
-        else
-        {
-            Debug.Log("Not enough currency.");
+            ShowPrompt(false);
         }
     }
 
@@ -54,12 +39,44 @@ public class CurrencyDropZone : MonoBehaviour
             {
                 inventory.currency -= cost;
                 Debug.Log("Currency placed!");
-                uiPrompt.SetActive(false);
+                ShowPrompt(false);
             }
             else
             {
                 Debug.Log("Not enough currency.");
             }
+        }
+    }
+
+    // Called by raycast hover script to toggle the prompt
+    public void ShowPrompt(bool show)
+    {
+        if (uiPrompt != null)
+        {
+            uiPrompt.SetActive(show);
+            if (show)
+            {
+                Text text = uiPrompt.GetComponentInChildren<Text>();
+                if (text != null)
+                {
+                    text.text = promptText;
+                }
+            }
+        }
+    }
+
+    public void TryPlaceCurrency()
+    {
+        PlayerInventory inventory = FindObjectOfType<PlayerInventory>();
+        if (inventory != null && inventory.coins >= 1)
+        {
+            inventory.coins -= 1;
+            Debug.Log("Currency placed!");
+            // Trigger upgrade or visual effect here
+        }
+        else
+        {
+            Debug.Log("Not enough currency.");
         }
     }
 }
