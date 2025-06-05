@@ -6,6 +6,7 @@ public class LevelGenerator : MonoBehaviour
 {
     public float tileSize = 1.01845f;
     public Vector3 spawnCenter = Vector3.zero;
+    public float[] yHeightOptions = new float[] {0f, 1f, 2f, 3f};
 
     [System.Serializable]
     public class HexTile
@@ -51,7 +52,8 @@ public class LevelGenerator : MonoBehaviour
 
             for (int y = 0; y < gridSize; y++)
             {
-                Vector3 spawnPos = spawnCenter + new Vector3(offsetX, 0f, offsetZ);
+                float randomY = yHeightOptions[Random.Range(0, yHeightOptions.Length)];
+                Vector3 spawnPos = spawnCenter + new Vector3(offsetX, randomY, offsetZ);
 
                 if (IsOverlappingCheckpoint(spawnPos))
                 {
