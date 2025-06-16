@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class CurrencyHoverPrompt : MonoBehaviour
+public class InteractionHoverPrompt : MonoBehaviour
 {
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private TMP_Text promptText; // You can keep this if you want a shared prompt text object
+    [SerializeField] private TMP_Text promptText;
 
-    private CurrencyDropZone lastZone = null;
+    private MonoBehaviour lastInteractable = null;
 
     void Update()
     {
@@ -19,43 +19,62 @@ public class CurrencyHoverPrompt : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, 100f, interactableLayer))
         {
-            if (hit.collider.CompareTag("CurrencyDropZone"))
+            GameObject hitObject = hit.collider.gameObject;
+
+            // Handle Currency
+            if (hitObject.CompareTag("CurrencyDropZone"))
             {
-                CurrencyDropZone zone = hit.collider.GetComponent<CurrencyDropZone>();
+                var zone = hitObject.GetComponent<CurrencyDropZone>();
                 if (zone != null)
                 {
-                    // Show this zone's prompt
                     zone.ShowPrompt(true);
+                    if (lastInteractable != null && lastInteractable != zone)
+                        (lastInteractable as CurrencyDropZone)?.ShowPrompt(false);
 
-                    // Hide the previous one if different
-                    if (lastZone != null && lastZone != zone)
-                    {
-                        lastZone.ShowPrompt(false);
-                    }
+                    lastInteractable = zone;
 
-                    lastZone = zone;
-
-                    // Update shared prompt text if you want, otherwise each drop zone sets its own text
                     if (promptText != null)
-                    {
                         promptText.text = "Press E to place currency";
-                    }
 
                     if (Input.GetKeyDown(KeyCode.E))
-                    {
                         zone.TryPlaceCurrency();
-                    }
+
+                    return;
+                }
+            }
+
+            // Handle Keyhole
+            if (hitObject.CompareTag("Keyhole"))
+            {
+                var keyhole = hitObject.GetComponent<Keyhole>();
+                if (keyhole != null)
+                {
+                    keyhole.ShowPrompt(true);
+                    if (lastInteractable != null && lastInteractable != keyhole)
+                        (lastInteractable as Keyhole)?.ShowPrompt(false);
+
+                    lastInteractable = keyhole;
+
+                    if (promptText != null)
+                        promptText.text = "Insert Keyshard Here";
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                        keyhole.TryInsertShard();
 
                     return;
                 }
             }
         }
 
-        // No hit or not a drop zone — hide last prompt
-        if (lastZone != null)
+        // Hide the previous prompt if no hit
+        if (lastInteractable != null)
         {
-            lastZone.ShowPrompt(false);
-            lastZone = null;
+            if (lastInteractable is CurrencyDropZone currency)
+                currency.ShowPrompt(false);
+            else if (lastInteractable is Keyhole keyhole)
+                keyhole.ShowPrompt(false);
+
+            lastInteractable = null;
         }
     }
 }
