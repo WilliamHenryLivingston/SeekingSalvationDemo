@@ -6,38 +6,59 @@ using UnityEngine;
 public class Keyhole : MonoBehaviour
 {
     [SerializeField] private GameObject promptUI;
+    [SerializeField] private Animator doorAnimator;
+    [SerializeField] private string openTriggerName = "Open";
+    [SerializeField] private int requiredShards = 3;
+
+    private int insertedShards = 0;
+    private bool doorOpened = false;
 
     public void ShowPrompt(bool show)
     {
-        Debug.Log("Prompt UI: " + (promptUI ? "Found" : "Missing") + ", show = " + show);
-
-        if (promptUI != null)
+        if (promptUI != null && !doorOpened)
         {
             promptUI.SetActive(show);
             var text = promptUI.GetComponentInChildren<TMP_Text>();
             if (text != null)
-            {
                 text.text = "Insert Keyshard Here";
-            }
         }
     }
 
     public void TryInsertShard()
     {
+        if (doorOpened) return;
+
         var inventory = PlayerInventory.Instance;
 
-        if (inventory.HasItem("KeyShard"))
+        if (inventory != null && inventory.HasItem("KeyShard"))
         {
             inventory.RemoveItemByName("KeyShard");
+            insertedShards++;
 
-            Debug.Log("Inserted shard!");
+            Debug.Log($"Shard inserted! ({insertedShards}/{requiredShards})");
 
-            // You could also track how many shards here or notify a door system
-            // You can expand this later to call KeyholeInteraction.UnlockDoor()
+            if (insertedShards >= requiredShards)
+            {
+                OpenDoor();
+            }
         }
         else
         {
             Debug.Log("No key shards in inventory.");
+        }
+    }
+
+    private void OpenDoor()
+    {
+        doorOpened = true;
+
+        if (promptUI != null)
+            promptUI.SetActive(false);
+
+        if (doorAnimator != null)
+        {
+            doorAnimator.SetTrigger(openTriggerName);
+            Debug.Log("All shards inserted. Door is opening.");
         }
     }
 }

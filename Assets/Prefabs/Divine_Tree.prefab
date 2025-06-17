@@ -442,6 +442,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   promptUI: {fileID: 848119806702638774, guid: e1a20d47602e56c408cfa11996028798, type: 3}
+  doorAnimator: {fileID: 3703344778348171890}
+  openTriggerName: OpenDoor
+  requiredShards: 3
 --- !u!1001 &3958563294983266081
 PrefabInstance:
   m_ObjectHideFlags: 0
