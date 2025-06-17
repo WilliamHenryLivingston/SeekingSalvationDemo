@@ -6,22 +6,30 @@ using UnityEngine;
 public class Door : MonoBehaviour
 {
     public Animator newanimator;
-    public Animator animator;
-    private void Start()
-    {
-        
+    private bool hasOpened = false;
 
-        
-    }
-
-    public void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(newanimator == null);
+        if (hasOpened) return;
+
+        if (other.CompareTag("Player"))
+        {
+            Unlock();
+        }
     }
 
     public void Unlock()
     {
-        Debug.Log("The door is now open.");
-        newanimator.SetTrigger("OpenDoor"); 
+        hasOpened = true;
+
+        if (newanimator != null)
+        {
+            newanimator.SetTrigger("OpenDoor");
+            Debug.Log("The door is now open.");
+        }
+        else
+        {
+            Debug.LogWarning("No animator assigned to the door.");
+        }
     }
 }
