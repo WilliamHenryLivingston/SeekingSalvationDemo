@@ -109,8 +109,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5afdfc7e5a1b1904785b6488c0b3c365, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetime: 100
-  fadeDuration: 50
+  lifetime: 25
+  fadeDuration: 20
 --- !u!135 &6455473000307278948
 SphereCollider:
   m_ObjectHideFlags: 0

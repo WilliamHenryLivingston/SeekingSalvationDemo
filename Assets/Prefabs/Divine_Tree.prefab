@@ -53,7 +53,7 @@ GameObject:
   - component: {fileID: 3634188852025412912}
   - component: {fileID: 1616339889407862701}
   - component: {fileID: 4875915703181153366}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Secret_Door_Trigger
   m_TagString: Checkpoint
   m_Icon: {fileID: 0}
@@ -117,9 +117,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 650190944926242353}
     m_Modifications:
+    - target: {fileID: 5797793867015967309, guid: 350d2f4f42fed1d49941476d477a287a, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6156054019853519439, guid: 350d2f4f42fed1d49941476d477a287a, type: 3}
       propertyPath: m_Name
       value: Transient_Tree
+      objectReference: {fileID: 0}
+    - target: {fileID: 6156054019853519439, guid: 350d2f4f42fed1d49941476d477a287a, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6783936369145958645, guid: 350d2f4f42fed1d49941476d477a287a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -161,6 +169,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7916063434202962813, guid: 350d2f4f42fed1d49941476d477a287a, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -182,6 +194,10 @@ PrefabInstance:
     - target: {fileID: 4793950395046372746, guid: 485ec736e5580ef42af0239a5e403157, type: 3}
       propertyPath: m_Name
       value: Hex_Tall_13 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4793950395046372746, guid: 485ec736e5580ef42af0239a5e403157, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4793950395046372746, guid: 485ec736e5580ef42af0239a5e403157, type: 3}
       propertyPath: m_TagString
@@ -294,6 +310,10 @@ PrefabInstance:
       value: ShiningWay
       objectReference: {fileID: 0}
     - target: {fileID: 6030167857529307615, guid: 54dab53a922503c44abeff280d99e9b1, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6030167857529307615, guid: 54dab53a922503c44abeff280d99e9b1, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -373,7 +393,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1137f78f38f1f11448984b158e901c07, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1137f78f38f1f11448984b158e901c07, type: 3}
       propertyPath: m_IsActive
@@ -453,9 +473,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3551750648680146165}
     m_Modifications:
+    - target: {fileID: 97817848078091218, guid: e1a20d47602e56c408cfa11996028798, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 848119806702638774, guid: e1a20d47602e56c408cfa11996028798, type: 3}
       propertyPath: m_Name
       value: DivineTree_Canvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 848119806702638774, guid: e1a20d47602e56c408cfa11996028798, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 848119806702638774, guid: e1a20d47602e56c408cfa11996028798, type: 3}
       propertyPath: m_IsActive
@@ -578,6 +606,10 @@ PrefabInstance:
     - target: {fileID: 3844200204480286929, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_Name
       value: Hex_Tall_13 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3844200204480286929, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3844200204480286929, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_IsActive
@@ -766,7 +798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6764124798724643540, guid: 7d5c15ff00023f2449d0aabbdeabf163, type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6764124798724643540, guid: 7d5c15ff00023f2449d0aabbdeabf163, type: 3}
       propertyPath: m_TagString
@@ -796,7 +828,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5146877935957497153, guid: ddca584646dede34487384b3fbeac75b, type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7378852790484427470, guid: ddca584646dede34487384b3fbeac75b, type: 3}
       propertyPath: m_LocalScale.y
@@ -905,6 +937,10 @@ PrefabInstance:
       value: Hex_Tall_9 2
       objectReference: {fileID: 0}
     - target: {fileID: 1731346254586879225, guid: 4574d19b216ed43498b6babb21fb5729, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1731346254586879225, guid: 4574d19b216ed43498b6babb21fb5729, type: 3}
       propertyPath: m_TagString
       value: Checkpoint
       objectReference: {fileID: 0}
@@ -933,6 +969,10 @@ PrefabInstance:
     - target: {fileID: 3844200204480286929, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_Name
       value: Hex_Tall_13 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3844200204480286929, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3844200204480286929, guid: 1a3f28976021e3f448003547b2cc90b6, type: 3}
       propertyPath: m_IsActive
@@ -1114,6 +1154,10 @@ PrefabInstance:
     - target: {fileID: 5741088322786882132, guid: 908c31a9347f30345a503e29f3c60510, type: 3}
       propertyPath: m_Name
       value: Door 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5741088322786882132, guid: 908c31a9347f30345a503e29f3c60510, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5741088322786882132, guid: 908c31a9347f30345a503e29f3c60510, type: 3}
       propertyPath: m_TagString
