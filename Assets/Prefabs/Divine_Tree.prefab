@@ -53,7 +53,7 @@ GameObject:
   - component: {fileID: 3634188852025412912}
   - component: {fileID: 1616339889407862701}
   - component: {fileID: 4875915703181153366}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Secret_Door_Trigger
   m_TagString: Checkpoint
   m_Icon: {fileID: 0}
@@ -798,7 +798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6764124798724643540, guid: 7d5c15ff00023f2449d0aabbdeabf163, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6764124798724643540, guid: 7d5c15ff00023f2449d0aabbdeabf163, type: 3}
       propertyPath: m_TagString
@@ -828,7 +828,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5146877935957497153, guid: ddca584646dede34487384b3fbeac75b, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7378852790484427470, guid: ddca584646dede34487384b3fbeac75b, type: 3}
       propertyPath: m_LocalScale.y
