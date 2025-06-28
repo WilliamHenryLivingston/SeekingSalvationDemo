@@ -429,9 +429,16 @@ namespace AtrillionGamesLtd
             }
             else
             { // If the player isn't touching the ground then their movement is dictated by the air control amount
+                if (!isWallRunning && !isGrounded && !isClambering && TryClamber(out Vector3 ledgePoint))
+                {
+                    StartCoroutine(ClamberToLedge(ledgePoint));
+                    return;
+                }
+
                 playerVelocity += move * playerMovementSpeed * playerAirControl * Time.fixedDeltaTime;
                 playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime; // Add gravity
                 playerVelocity *= 1f - playerAirResistance; // Add Air Resistance
+
                 if(playerVelocity.magnitude > localAirSpeedCap && localAirSpeedCap > 0f) // caps the player to a maximum air velocity
                 {
                     float dot = Mathf.Max(Vector3.Dot(playerVelocity, gravityDirection), 0f);
@@ -640,6 +647,66 @@ namespace AtrillionGamesLtd
         {
             currentStamina -= amount;
             currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+     
         }
+
+        //CLAMBER SECTION
+
+        [SerializeField] private float clamberWallCheckDistance = 0.5f;
+        [SerializeField] private float clamberLedgeCheckHeight = 1.2f;
+        [SerializeField] private float clamberTransitionDuration = 0.25f;
+        [SerializeField] private float clamberHeightOffset = 1.0f;
+        [SerializeField] private LayerMask clamberCheckLayers = ~0;
+
+        private bool isClambering = false;
+
+        bool TryClamber(out Vector3 ledgePoint)
+        {
+            ledgePoint = Vector3.zero;
+
+            Vector3 origin = transform.position + Vector3.up * 1.2f;
+            Vector3 dir = transform.forward;
+
+            if (Physics.Raycast(origin, dir, out RaycastHit wallHit, clamberWallCheckDistance, clamberCheckLayers))
+            {
+                Vector3 ledgeCheckOrigin = wallHit.point + Vector3.up * clamberLedgeCheckHeight;
+
+                if (Physics.Raycast(ledgeCheckOrigin, Vector3.down, out RaycastHit ledgeHit, clamberLedgeCheckHeight * 2f, clamberCheckLayers))
+                {
+                    if (Vector3.Angle(ledgeHit.normal, Vector3.up) <= maxWalkableSlope)
+                    {
+                        ledgePoint = ledgeHit.point;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        IEnumerator ClamberToLedge(Vector3 targetPoint)
+        {
+            isClambering = true;
+            canPerformActions = false;
+            playerBodyRigidBody.velocity = Vector3.zero;
+
+            Vector3 startPos = transform.position;
+            Vector3 endPos = targetPoint + Vector3.up * clamberHeightOffset;
+
+            float t = 0f;
+            while (t < clamberTransitionDuration)
+            {
+                t += Time.deltaTime;
+                transform.position = Vector3.Lerp(startPos, endPos, t / clamberTransitionDuration);
+                yield return null;
+            }
+
+            transform.position = endPos;
+            isClambering = false;
+            canPerformActions = true;
+        }
+
     }
+
+
 }
