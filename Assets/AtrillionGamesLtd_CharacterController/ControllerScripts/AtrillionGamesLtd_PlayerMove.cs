@@ -51,12 +51,12 @@ namespace AtrillionGamesLtd
         [SerializeField] private float stairAndStepClimbRate = 10.0f;
         [SerializeField] private float rotateTowardsGravityRate = 10f;
         [SerializeField] private float gravityValue = 9.81f;
-        [SerializeField] private Vector3 gravityDirection = new Vector3(0f,-1f,0f);
+        [SerializeField] private Vector3 gravityDirection = new Vector3(0f, -1f, 0f);
         [Space]
 
         [SerializeField] private float headOffset;
         [Space]
-        
+
         [SerializeField] private float playerAirControl = 1.5f;
         [SerializeField] private float playerAirResistance = 0.01f;
         [SerializeField] private float playerSlideControl = 2.5f;
@@ -108,28 +108,33 @@ namespace AtrillionGamesLtd
             inputActions.Disable();
         }
 
-        void setHeadPosition(float headHeight){
+        void setHeadPosition(float headHeight)
+        {
             headOffset = headHeight;
         }
 
         // change gravity direction towards new direction at a specific rate (1 is instant, 0 means not at all)
         // used for either instant swapping or gradual changing for smoother transitions
-        public void setPlayerGravityDirection(Vector3 _gravityDirection, float rateOfChange = 1f){
+        public void setPlayerGravityDirection(Vector3 _gravityDirection, float rateOfChange = 1f)
+        {
             gravityDirection = Vector3.Lerp(gravityDirection, _gravityDirection.normalized, rateOfChange);
         }
 
         // Sets the player camera's Field Of View
-        public void setPlayerFOV(float _FOV){
+        public void setPlayerFOV(float _FOV)
+        {
             playerCamera.GetComponent<Camera>().fieldOfView = _FOV;
         }
 
         // Sets the player camera's Sensitivity
-        public void setCameraSensitivity(float _Sensitivity){
+        public void setCameraSensitivity(float _Sensitivity)
+        {
             sensitivity = _Sensitivity;
         }
 
         // On game initiation this ensures that all the required components are present and correctly initialised in order for the character controller to work
-        void AddScriptsIfMissing(){
+        void AddScriptsIfMissing()
+        {
 
             playerBodyCollider = GetComponent<CapsuleCollider>();
             if (playerBodyCollider == null)
@@ -161,7 +166,8 @@ namespace AtrillionGamesLtd
             playerBodyRigidBody.useGravity = false;
             playerBodyRigidBody.interpolation = RigidbodyInterpolation.Interpolate;
 
-            if(playerCamera == null){
+            if (playerCamera == null)
+            {
                 playerCamera = Camera.main.transform; // If no camera is assigned it will just use whatever the main scene camera is as the player camera
             }
 
@@ -173,7 +179,9 @@ namespace AtrillionGamesLtd
                 playerCameraHolderGameObject.transform.SetParent(transform);  // Set null as parent
                 playerCamera.transform.SetParent(playerCameraHolderGameObject.transform);  // Set null as parent
                 playerCameraHolder = playerCameraHolderGameObject.transform;
-            }else{
+            }
+            else
+            {
                 playerCameraHolder.transform.SetParent(transform);  // Set null as parent
                 playerCamera.transform.SetParent(playerCameraHolder);  // Set null as parent
             }
@@ -204,7 +212,8 @@ namespace AtrillionGamesLtd
             playerBodyCollider.height = playerCrouchHeight;
             playerBodyCollider.radius = playerRadius;
 
-            if(playerStandingHeight-playerCrouchHeight < stepHeight){
+            if (playerStandingHeight-playerCrouchHeight < stepHeight)
+            {
                 Debug.LogWarning("Step height exceeds player leg length. (playerStandingHeight - playerCrouchHeight) is the leg length");
             }
             stepHeight = Mathf.Min(stepHeight, playerStandingHeight-playerCrouchHeight);
@@ -216,7 +225,8 @@ namespace AtrillionGamesLtd
         {
             // the angle between the player down vector and the expected down vector
             float angleToTarget = Vector3.Angle(-_transform.up, targetDirection);
-            if(angleToTarget > 0f){
+            if (angleToTarget > 0f)
+            {
                 // Calculates the direction to rotate towards to ensure the player is alinged with gravity
                 Vector3 stepTargetDirection = Vector3.Slerp(-_transform.up, targetDirection, Mathf.Clamp01((rotationSpeed*10f)/(angleToTarget)));
                 // Calculate the rotation that aligns the transform that points down with stepTargetDirection
@@ -257,27 +267,36 @@ namespace AtrillionGamesLtd
             //Debug.DrawRay(playerCamera.position, playerCamera.forward*10f, Color.blue, 5f);
         }
 
-        void standingOnMovingSurface(Transform Surface, Vector3 position){
-            if(lastSurface && Surface){ // Ground To Ground transition
-                if(lastSurface != Surface){
+        void standingOnMovingSurface(Transform Surface, Vector3 position)
+        {
+            if (lastSurface && Surface)
+            { // Ground To Ground transition
+                if (lastSurface != Surface)
+                {
                     transform.SetParent(null);
                     wherePlayerLastStood.transform.position = Surface.position;
                     wherePlayerLastStood.transform.rotation = Surface.rotation;
                     transform.SetParent(wherePlayerLastStood.transform);
 
                     //print("NewFloor " + Surface.name);
-                }else{
+                }
+                else
+                {
                     wherePlayerLastStood.transform.position = Surface.position;
                     wherePlayerLastStood.transform.rotation = Surface.rotation;
                     //print("Still on NewFloor " + Surface.name);
                 }
-            }else{
-                if(lastSurface){ // Ground to Air transition
+            }
+            else
+            {
+                if (lastSurface)
+                { // Ground to Air transition
                     localAirSpeedCap = Mathf.Min(absolutePlayerVelocity.magnitude, airtimeSpeedCap);
                     playerVelocity += absolutePlayerVelocity;
                     //print("OffFloor " + absolutePlayerVelocity);
                 }
-                if(Surface){ // Air to Ground transition
+                if (Surface)
+                { // Air to Ground transition
                     transform.SetParent(null);
                     wherePlayerLastStood.transform.position = Surface.position;
                     wherePlayerLastStood.transform.rotation = Surface.rotation;
@@ -288,7 +307,8 @@ namespace AtrillionGamesLtd
             lastSurface = Surface;
         }
 
-        void whatIsPlayerStoodOn(ref Vector3 slopeDirection, ref Vector3 slideDirection, ref float groundFriction){
+        void whatIsPlayerStoodOn(ref Vector3 slopeDirection, ref Vector3 slideDirection, ref float groundFriction)
+        {
             //Debug.DrawRay(playerCamera.position, playerCamera.forward*10f, Color.green, 5f);
 
             isGrounded = false;
@@ -304,7 +324,8 @@ namespace AtrillionGamesLtd
 
                 isGrounded = angle < maxWalkableSlope || isGrounded;
 
-                if(angle < maxWalkableSlope){ // If this specific contact point is a grounded point
+                if (angle < maxWalkableSlope)
+                { // If this specific contact point is a grounded point
                     slopeNormal = directlyGrounded.normal;
                     slopeDirection = Vector3.ProjectOnPlane(gravityDirection, directlyGrounded.normal); // slope direction
                     slideDirection = slopeDirection * Vector3.Dot(gravityDirection, slopeDirection);
@@ -317,27 +338,36 @@ namespace AtrillionGamesLtd
                         groundFriction = hitMaterial.dynamicFriction;
                     }
                 }
-            }else{
+            }
+            else
+            {
                 standingOnMovingSurface(null, Vector3.zero);
             }
         }
 
         // Move in the direction the player is facing
-        Vector3 getPlayerMoveDirection(Vector3 slopeDirection){
+        Vector3 getPlayerMoveDirection(Vector3 slopeDirection)
+        {
             Vector3 move = playerCamera.forward * movementInput.y + playerCamera.right * movementInput.x;
-            if(isGrounded){
+            if (isGrounded)
+            {
                 move = Vector3.ProjectOnPlane(move, gravityDirection);
-                if(!isSliding){ // move down slopes or stairs rather than falling down them
+                if (!isSliding)
+                { // move down slopes or stairs rather than falling down them
                     move = Vector3.ProjectOnPlane(move, slopeNormal);
                 }
                 move = move.normalized; // Normalize to prevent diagonal speed boost (Respects real max speed rather than getting sqrt(2)*max speed as the max speed when moving diagonally)
                 pointInWallRun = 0f;
-            }else{
+            }
+            else
+            {
                 Vector3 flattenedMove = Vector3.ProjectOnPlane(move, gravityDirection).normalized;
 
-                if(isWallRunning){
+                if (isWallRunning)
+                {
                     handleWallRunning(ref move, flattenedMove);
-                }else
+                }
+                else
                 {
                     pointInWallRun = 0f;
                     move = Vector3.ProjectOnPlane(move, gravityDirection);
@@ -346,14 +376,16 @@ namespace AtrillionGamesLtd
             return move;
         }
 
-        void handleWallRunning(ref Vector3 move, Vector3 flattenedMove){
+        void handleWallRunning(ref Vector3 move, Vector3 flattenedMove)
+        {
             move = Vector3.ProjectOnPlane(move, slopeNormal); // slope direction
             move = Vector3.Lerp(move, flattenedMove, 0.1f);
             move = move.normalized;
             pointInWallRun += Time.fixedDeltaTime;
         }
 
-        void handleCrouching(ref float playerMovementSpeed){
+        void handleCrouching(ref float playerMovementSpeed)
+        {
             if (isCrouching)
             {
                 setHeadPosition(playerCrouchHeight); // move the player head down to crouched height
@@ -394,7 +426,8 @@ namespace AtrillionGamesLtd
             }
         }
 
-        void handleMovement(float playerMovementSpeed, Vector3 move){
+        void handleMovement(float playerMovementSpeed, Vector3 move)
+        {
             // If the player is grounded, apply movement grounded movement
             if (isGrounded)
             {
@@ -439,7 +472,7 @@ namespace AtrillionGamesLtd
                 playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime; // Add gravity
                 playerVelocity *= 1f - playerAirResistance; // Add Air Resistance
 
-                if(playerVelocity.magnitude > localAirSpeedCap && localAirSpeedCap > 0f) // caps the player to a maximum air velocity
+                if (playerVelocity.magnitude > localAirSpeedCap && localAirSpeedCap > 0f) // caps the player to a maximum air velocity
                 {
                     float dot = Mathf.Max(Vector3.Dot(playerVelocity, gravityDirection), 0f);
                     Vector3 newVelocity = (playerVelocity.normalized * localAirSpeedCap);
@@ -574,7 +607,8 @@ namespace AtrillionGamesLtd
 
                 isWallRunning = ((angle > maxWalkableSlope && angle < 120f) || isWallRunning) && !isGrounded; // Less than 120 to prevent the player from wallrunning on ceilings or overhangs
 
-                if(isWallRunning && !isGrounded){ // If this specific contact point is a wallRunning point
+                if (isWallRunning && !isGrounded)
+                { // If this specific contact point is a wallRunning point
                     slopeNormal = contact.normal; // This will get overwritten if one of the later contact points shows it is grounded
                 }
             }
@@ -586,7 +620,8 @@ namespace AtrillionGamesLtd
             isWallRunning = false;
         }
 
-        void playerInputs(){
+        void playerInputs()
+        {
             isSprinting = Input.GetButton("Sprint");
             isCrouching = Input.GetButton("Crouch");
             isJumping = Input.GetButton("Jump");
@@ -618,7 +653,7 @@ namespace AtrillionGamesLtd
 
         private void HandleStamina()
         {
-            
+
             // Regenerate stamina when not performing stamina-costing actions
             if (!isSprinting && !isWallRunning)
             {
@@ -647,15 +682,15 @@ namespace AtrillionGamesLtd
         {
             currentStamina -= amount;
             currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-     
+
         }
 
-        //CLAMBER SECTION
+        // CLAMBER SECTION
 
-        [SerializeField] private float clamberWallCheckDistance = 0.5f;
-        [SerializeField] private float clamberLedgeCheckHeight = 1.2f;
+        [SerializeField] private float clamberWallCheckDistance = 100f;
+        [SerializeField] private float clamberLedgeCheckHeight = 300f;
         [SerializeField] private float clamberTransitionDuration = 0.25f;
-        [SerializeField] private float clamberHeightOffset = 1.0f;
+        [SerializeField] private float clamberHeightOffset = 100f;
         [SerializeField] private LayerMask clamberCheckLayers = ~0;
 
         private bool isClambering = false;
@@ -664,16 +699,17 @@ namespace AtrillionGamesLtd
         {
             ledgePoint = Vector3.zero;
 
-            Vector3 origin = transform.position + Vector3.up * 1.2f;
+            Vector3 upDirection = -gravityDirection.normalized;
+            Vector3 origin = transform.position + upDirection * 1.2f;
             Vector3 dir = transform.forward;
 
             if (Physics.Raycast(origin, dir, out RaycastHit wallHit, clamberWallCheckDistance, clamberCheckLayers))
             {
-                Vector3 ledgeCheckOrigin = wallHit.point + Vector3.up * clamberLedgeCheckHeight;
+                Vector3 ledgeCheckOrigin = wallHit.point + upDirection * clamberLedgeCheckHeight;
 
-                if (Physics.Raycast(ledgeCheckOrigin, Vector3.down, out RaycastHit ledgeHit, clamberLedgeCheckHeight * 2f, clamberCheckLayers))
+                if (Physics.SphereCast(ledgeCheckOrigin, 10f, -upDirection, out RaycastHit ledgeHit, clamberLedgeCheckHeight * 2f, clamberCheckLayers))
                 {
-                    if (Vector3.Angle(ledgeHit.normal, Vector3.up) <= maxWalkableSlope)
+                    if (Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
                     {
                         ledgePoint = ledgeHit.point;
                         return true;
@@ -684,14 +720,51 @@ namespace AtrillionGamesLtd
             return false;
         }
 
+        public bool TryClamberFromGrapple(Vector3 grapplePoint)
+        {
+            if (CanClamberAtPoint(grapplePoint, out Vector3 ledgePoint))
+            {
+                StartCoroutine(ClamberToLedge(ledgePoint));
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool CanClamberAtPoint(Vector3 grapplePoint, out Vector3 ledgePoint)
+        {
+            ledgePoint = Vector3.zero;
+
+            Vector3 upDirection = -gravityDirection.normalized;
+            Vector3 inwardOffset = -transform.forward * 0.5f; // Look slightly inward
+            Vector3 ledgeCheckOrigin = grapplePoint + upDirection * clamberLedgeCheckHeight + inwardOffset;
+
+            if (Physics.SphereCast(ledgeCheckOrigin, 0.4f, -upDirection, out RaycastHit ledgeHit, clamberLedgeCheckHeight * 2f, clamberCheckLayers))
+            {
+                float verticalDelta = Vector3.Dot(ledgeHit.point - grapplePoint, upDirection);
+                if (verticalDelta > 1f && Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
+                {
+                    ledgePoint = ledgeHit.point;
+                    return true;
+                }
+            }
+
+            Debug.DrawRay(ledgeCheckOrigin, -upDirection * clamberLedgeCheckHeight * 2f, Color.red, 1f);
+            return false;
+        }
+
         IEnumerator ClamberToLedge(Vector3 targetPoint)
         {
             isClambering = true;
             canPerformActions = false;
             playerBodyRigidBody.velocity = Vector3.zero;
 
+            Vector3 upDirection = -gravityDirection.normalized;
+
             Vector3 startPos = transform.position;
-            Vector3 endPos = targetPoint + Vector3.up * clamberHeightOffset;
+            Vector3 endPos = targetPoint + upDirection * clamberHeightOffset;
 
             float t = 0f;
             while (t < clamberTransitionDuration)
@@ -705,6 +778,34 @@ namespace AtrillionGamesLtd
             isClambering = false;
             canPerformActions = true;
         }
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (!Application.isPlaying) return;
+
+            Vector3 upDirection = -gravityDirection.normalized;
+
+            // Simulate where the grapple point would be (use transform.position for test)
+            Vector3 grapplePoint = transform.position;
+
+            Vector3 forwardOffset = -transform.forward * 1.0f; // Adjust this inward depth
+            Vector3 ledgeCheckOrigin = grapplePoint + upDirection * clamberLedgeCheckHeight + forwardOffset;
+            float radius = 0.5f;
+            float distance = clamberLedgeCheckHeight * 2f;
+
+            // Draw the cast path
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(ledgeCheckOrigin, ledgeCheckOrigin - upDirection * distance);
+
+            // Draw sphere at start
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(ledgeCheckOrigin, radius);
+
+            // Draw sphere at end
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(ledgeCheckOrigin - upDirection * distance, radius);
+        }
+#endif
 
     }
 
