@@ -32,6 +32,7 @@ namespace AtrillionGamesLtd
         [SerializeField] private bool isSliding;
         [SerializeField] private bool isWallRunning;
         [SerializeField] private bool isJumpDisabled;
+        [HideInInspector] public bool isGrappling = false;
         [Space]
         [Header("Player Details")]
         [SerializeField] private float playerRadius = 0.5f;
@@ -462,7 +463,7 @@ namespace AtrillionGamesLtd
             }
             else
             { // If the player isn't touching the ground then their movement is dictated by the air control amount
-                if (!isWallRunning && !isGrounded && !isClambering && TryClamber(out Vector3 ledgePoint))
+                if (isGrappling && !isWallRunning && !isGrounded && !isClambering && TryClamber(out Vector3 ledgePoint))
                 {
                     StartCoroutine(ClamberToLedge(ledgePoint));
                     return;

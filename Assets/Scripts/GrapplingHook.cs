@@ -16,7 +16,6 @@ public class GrapplingHook : MonoBehaviour
     private Vector3 grapplePoint;
 
     private AtrillionGamesLtd_PlayerMove playerMoveScript;
-    private PlayerClamber playerClamber; //  Reference to clamber script
 
     void Start()
     {
@@ -25,7 +24,6 @@ public class GrapplingHook : MonoBehaviour
         if (playerObj != null)
         {
             playerMoveScript = playerObj.GetComponent<AtrillionGamesLtd_PlayerMove>();
-            playerClamber = playerObj.GetComponent<PlayerClamber>(); //  Fix: Now this works
         }
         else
         {
@@ -47,9 +45,9 @@ public class GrapplingHook : MonoBehaviour
                 playerRb.useGravity = false;
                 playerRb.velocity = Vector3.zero;
 
-                //  Enable clambering during grapple
-                if (playerClamber != null)
-                    playerClamber.isGrappling = true;
+                // Enable grappling state for clamber
+                if (playerMoveScript != null)
+                    playerMoveScript.isGrappling = true;
             }
         }
 
@@ -61,9 +59,9 @@ public class GrapplingHook : MonoBehaviour
                 isHanging = false;
                 playerRb.useGravity = true;
 
-                //  Disable clambering when hanging ends
-                if (playerClamber != null)
-                    playerClamber.isGrappling = false;
+                // Disable grappling state
+                if (playerMoveScript != null)
+                    playerMoveScript.isGrappling = false;
             }
         }
     }
@@ -125,9 +123,9 @@ public class GrapplingHook : MonoBehaviour
         playerRb.useGravity = true;
         playerRb.velocity = Vector3.zero;
 
-        //  Disable clambering when grapple is canceled
-        if (playerClamber != null)
-            playerClamber.isGrappling = false;
+        // Disable grappling state
+        if (playerMoveScript != null)
+            playerMoveScript.isGrappling = false;
 
         // Optional: Add feedback here, e.g., sound or effects
     }
