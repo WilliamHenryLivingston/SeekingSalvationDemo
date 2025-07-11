@@ -15,18 +15,21 @@ public class GrapplingHook : MonoBehaviour
     private bool isHanging = false;
     private Vector3 grapplePoint;
 
-    // NEW: Reference to player movement/clamber script
     private AtrillionGamesLtd_PlayerMove playerMoveScript;
+    private PlayerClamber playerClamber; //  Reference to clamber script
 
     void Start()
     {
-        // Find and assign the movement script (assumes this is on the same object or the player is tagged)
-        playerMoveScript = GetComponent<AtrillionGamesLtd_PlayerMove>();
-        if (playerMoveScript == null)
+        GameObject playerObj = GameObject.FindWithTag("Player");
+
+        if (playerObj != null)
         {
-            GameObject playerObj = GameObject.FindWithTag("Player");
-            if (playerObj != null)
-                playerMoveScript = playerObj.GetComponent<AtrillionGamesLtd_PlayerMove>();
+            playerMoveScript = playerObj.GetComponent<AtrillionGamesLtd_PlayerMove>();
+            playerClamber = playerObj.GetComponent<PlayerClamber>(); //  Fix: Now this works
+        }
+        else
+        {
+            Debug.LogWarning("Player object not found. Make sure it is tagged 'Player'.");
         }
     }
 
@@ -43,6 +46,10 @@ public class GrapplingHook : MonoBehaviour
                 isHanging = false;
                 playerRb.useGravity = false;
                 playerRb.velocity = Vector3.zero;
+
+                //  Enable clambering during grapple
+                if (playerClamber != null)
+                    playerClamber.isGrappling = true;
             }
         }
 
@@ -53,6 +60,10 @@ public class GrapplingHook : MonoBehaviour
             {
                 isHanging = false;
                 playerRb.useGravity = true;
+
+                //  Disable clambering when hanging ends
+                if (playerClamber != null)
+                    playerClamber.isGrappling = false;
             }
         }
     }
@@ -69,24 +80,20 @@ public class GrapplingHook : MonoBehaviour
                 isZipping = false;
                 playerRb.velocity = Vector3.zero;
 
-                // New: Try to clamber from the grapple point
                 if (playerMoveScript != null)
                 {
                     bool clambered = playerMoveScript.TryClamberFromGrapple(grapplePoint);
 
                     if (!clambered)
                     {
-                        // Fallback: stick to wall like before
                         isHanging = true;
                         playerRb.useGravity = false;
                         playerRb.velocity = Vector3.zero;
-                        transform.position = grapplePoint; // Optional: if you're not already at exact point
+                        transform.position = grapplePoint;
                     }
-
                 }
                 else
                 {
-                    // Fallback: Hang if no clamber
                     isHanging = true;
                 }
 
@@ -101,5 +108,27 @@ public class GrapplingHook : MonoBehaviour
         {
             playerRb.velocity = Vector3.zero;
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isZipping)
+        {
+            CancelGrapple();
+        }
+    }
+
+    private void CancelGrapple()
+    {
+        isZipping = false;
+        isHanging = false;
+        playerRb.useGravity = true;
+        playerRb.velocity = Vector3.zero;
+
+        //  Disable clambering when grapple is canceled
+        if (playerClamber != null)
+            playerClamber.isGrappling = false;
+
+        // Optional: Add feedback here, e.g., sound or effects
     }
 }
