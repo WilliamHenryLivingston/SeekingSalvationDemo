@@ -701,14 +701,28 @@ namespace AtrillionGamesLtd
             ledgePoint = Vector3.zero;
 
             Vector3 upDirection = -gravityDirection.normalized;
-            Vector3 origin = transform.position + upDirection * 1.2f;
+
+            // Place origin at player's position + a bit above head height to detect walls properly
+            Vector3 origin = transform.position + upDirection * 1.5f; // Raise origin to head height
+
+            // Cast forward from player's facing direction (transform.forward)
             Vector3 dir = transform.forward;
 
-            if (Physics.Raycast(origin, dir, out RaycastHit wallHit, clamberWallCheckDistance, clamberCheckLayers))
-            {
-                Vector3 ledgeCheckOrigin = wallHit.point + upDirection * clamberLedgeCheckHeight;
+            // Shorten wall check distance if too long
+            float wallCheckDistance = Mathf.Min(clamberWallCheckDistance, 2f); // max 2 meters in front
 
-                if (Physics.SphereCast(ledgeCheckOrigin, 10f, -upDirection, out RaycastHit ledgeHit, clamberLedgeCheckHeight * 2f, clamberCheckLayers))
+            if (Physics.Raycast(origin, dir, out RaycastHit wallHit, wallCheckDistance, clamberCheckLayers))
+            {
+                // Ledge check origin: just above the wall hit point, shifted slightly back towards the player
+                Vector3 ledgeCheckOrigin = wallHit.point + upDirection * 1.2f - dir * 0.3f;
+
+                // Smaller sphere radius for precise check
+                float sphereRadius = 0.3f;
+
+                // Shorten ledge check height for better accuracy
+                float ledgeCheckHeight = Mathf.Min(clamberLedgeCheckHeight, 1.5f);
+
+                if (Physics.SphereCast(ledgeCheckOrigin, sphereRadius, -upDirection, out RaycastHit ledgeHit, ledgeCheckHeight * 2f, clamberCheckLayers))
                 {
                     if (Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
                     {
@@ -720,7 +734,6 @@ namespace AtrillionGamesLtd
 
             return false;
         }
-
         public bool TryClamberFromGrapple(Vector3 grapplePoint)
         {
             if (CanClamberAtPoint(grapplePoint, out Vector3 ledgePoint))
@@ -785,29 +798,24 @@ namespace AtrillionGamesLtd
             if (!Application.isPlaying) return;
 
             Vector3 upDirection = -gravityDirection.normalized;
+            Vector3 origin = transform.position + upDirection * 1.5f;
+            Vector3 dir = transform.forward;
+            float wallCheckDistance = Mathf.Min(clamberWallCheckDistance, 2f);
 
-            // Simulate where the grapple point would be (use transform.position for test)
-            Vector3 grapplePoint = transform.position;
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(origin, origin + dir * wallCheckDistance);
 
-            Vector3 forwardOffset = -transform.forward * 1.0f; // Adjust this inward depth
-            Vector3 ledgeCheckOrigin = grapplePoint + upDirection * clamberLedgeCheckHeight + forwardOffset;
-            float radius = 0.5f;
-            float distance = clamberLedgeCheckHeight * 2f;
+            Vector3 ledgeCheckOrigin = origin + dir * wallCheckDistance + upDirection * 1.2f - dir * 0.3f;
+            float sphereRadius = 0.3f;
+            float ledgeCheckHeight = Mathf.Min(clamberLedgeCheckHeight, 1.5f);
 
-            // Draw the cast path
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(ledgeCheckOrigin, ledgeCheckOrigin - upDirection * distance);
+            Gizmos.DrawWireSphere(ledgeCheckOrigin, sphereRadius);
 
-            // Draw sphere at start
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(ledgeCheckOrigin, radius);
-
-            // Draw sphere at end
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(ledgeCheckOrigin - upDirection * distance, radius);
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(ledgeCheckOrigin, ledgeCheckOrigin - upDirection * ledgeCheckHeight * 2f);
         }
 #endif
-
     }
 
 
