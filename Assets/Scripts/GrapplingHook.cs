@@ -9,10 +9,11 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] private Rigidbody playerRb;
     [SerializeField] private float grappleRange = 100f;
     [SerializeField] private float pullSpeed = 20f;
-    [SerializeField] private LayerMask Default;
+    [SerializeField] private LayerMask grappleLayers;
+    [SerializeField] private GameObject grappleReticle;
 
     private bool isZipping = false;
-    private bool isHanging = false;
+    private bool isAiming = false;
     private Vector3 grapplePoint;
 
     private AtrillionGamesLtd_PlayerMove playerMoveScript;
@@ -29,83 +30,99 @@ public class GrapplingHook : MonoBehaviour
         {
             Debug.LogWarning("Player object not found. Make sure it is tagged 'Player'.");
         }
+
+        if (grappleReticle != null)
+            grappleReticle.SetActive(false);
     }
 
     void Update()
     {
-        // Left Click: Fire grapple
-        if (Input.GetMouseButtonDown(0)) // LMB
+        // Right-click hold to aim
+        if (Input.GetMouseButtonDown(1))
+        {
+            isAiming = true;
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            isAiming = false;
+            if (grappleReticle != null)
+                grappleReticle.SetActive(false);
+        }
+
+        if (isAiming)
         {
             Ray ray = playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
-            if (Physics.Raycast(ray, out RaycastHit hit, grappleRange, Default))
+            if (Physics.Raycast(ray, out RaycastHit hit, grappleRange, grappleLayers))
             {
-                grapplePoint = hit.point;
-                isZipping = true;
-                isHanging = false;
-                playerRb.useGravity = false;
-                playerRb.velocity = Vector3.zero;
+                if (grappleReticle != null)
+                {
+                    grappleReticle.SetActive(true);
+                    grappleReticle.transform.position = hit.point;
+                }
 
-                // Enable grappling state for clamber
-                if (playerMoveScript != null)
-                    playerMoveScript.isGrappling = true;
+                if (Input.GetMouseButtonDown(0)) // Left click to fire
+                {
+                    FireGrapple(hit.point);
+                }
+            }
+            else
+            {
+                if (grappleReticle != null)
+                    grappleReticle.SetActive(false);
             }
         }
 
-        // Right Click: Detach from wall
-        if (Input.GetMouseButtonDown(1)) // RMB
+        // Cancel grapple manually (optional)
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isHanging)
-            {
-                isHanging = false;
-                playerRb.useGravity = true;
+            CancelGrapple();
+        }
 
-                // Disable grappling state
-                if (playerMoveScript != null)
-                    playerMoveScript.isGrappling = false;
-            }
+        if (isZipping)
+        {
+            GrappleMove();
         }
     }
 
-    void FixedUpdate()
+    void FireGrapple(Vector3 point)
     {
-        if (isZipping)
+        grapplePoint = point;
+        isZipping = true;
+        playerRb.useGravity = false;
+        playerRb.velocity = Vector3.zero;
+
+        if (playerMoveScript != null)
+            playerMoveScript.isGrappling = true;
+    }
+
+    void GrappleMove()
+    {
+        Vector3 direction = grapplePoint - playerRb.position;
+        float distance = direction.magnitude;
+
+        if (distance < 1f)
         {
-            Vector3 direction = grapplePoint - playerRb.position;
-            float distance = direction.magnitude;
+            isZipping = false;
+            playerRb.velocity = Vector3.zero;
 
-            if (distance < 1f)
+            if (playerMoveScript != null)
             {
-                isZipping = false;
-                playerRb.velocity = Vector3.zero;
+                bool clambered = playerMoveScript.TryClamberFromGrapple(grapplePoint);
 
-                if (playerMoveScript != null)
+                if (!clambered)
                 {
-                    bool clambered = playerMoveScript.TryClamberFromGrapple(grapplePoint);
-
-                    if (!clambered)
-                    {
-                        isHanging = true;
-                        playerRb.useGravity = false;
-                        playerRb.velocity = Vector3.zero;
-                        transform.position = grapplePoint;
-                    }
+                    playerRb.useGravity = false;
+                    playerRb.velocity = Vector3.zero;
+                    transform.position = grapplePoint;
                 }
-                else
-                {
-                    isHanging = true;
-                }
-
-                return;
             }
 
-            Vector3 moveStep = direction.normalized * pullSpeed * Time.fixedDeltaTime;
-            playerRb.MovePosition(playerRb.position + moveStep);
+            return;
         }
 
-        if (isHanging)
-        {
-            playerRb.velocity = Vector3.zero;
-        }
+        Vector3 moveStep = direction.normalized * pullSpeed * Time.deltaTime;
+        playerRb.MovePosition(playerRb.position + moveStep);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -119,14 +136,14 @@ public class GrapplingHook : MonoBehaviour
     private void CancelGrapple()
     {
         isZipping = false;
-        isHanging = false;
+        isAiming = false;
         playerRb.useGravity = true;
         playerRb.velocity = Vector3.zero;
 
-        // Disable grappling state
+        if (grappleReticle != null)
+            grappleReticle.SetActive(false);
+
         if (playerMoveScript != null)
             playerMoveScript.isGrappling = false;
-
-        // Optional: Add feedback here, e.g., sound or effects
     }
 }

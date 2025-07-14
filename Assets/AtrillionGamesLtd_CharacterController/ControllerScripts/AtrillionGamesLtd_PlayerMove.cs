@@ -688,8 +688,8 @@ namespace AtrillionGamesLtd
 
         // CLAMBER SECTION
 
-        [SerializeField] private float clamberWallCheckDistance = 100f;
-        [SerializeField] private float clamberLedgeCheckHeight = 300f;
+        //[SerializeField] private float clamberWallCheckDistance = 100f;
+        //[SerializeField] private float clamberLedgeCheckHeight = 300f;
         [SerializeField] private float clamberTransitionDuration = 0.25f;
         [SerializeField] private float clamberHeightOffset = 100f;
         [SerializeField] private LayerMask clamberCheckLayers = ~0;
@@ -701,28 +701,21 @@ namespace AtrillionGamesLtd
             ledgePoint = Vector3.zero;
 
             Vector3 upDirection = -gravityDirection.normalized;
+            Vector3 forward = transform.forward;
 
-            // Place origin at player's position + a bit above head height to detect walls properly
-            Vector3 origin = transform.position + upDirection * 1.5f; // Raise origin to head height
+            // Check from chest height slightly in front of player
+            Vector3 wallCheckOrigin = transform.position + upDirection * 1.0f + forward * 0.4f;
 
-            // Cast forward from player's facing direction (transform.forward)
-            Vector3 dir = transform.forward;
-
-            // Shorten wall check distance if too long
-            float wallCheckDistance = Mathf.Min(clamberWallCheckDistance, 2f); // max 2 meters in front
-
-            if (Physics.Raycast(origin, dir, out RaycastHit wallHit, wallCheckDistance, clamberCheckLayers))
+            float wallCheckDistance = 1.0f;
+            if (Physics.Raycast(wallCheckOrigin, forward, out RaycastHit wallHit, wallCheckDistance, clamberCheckLayers))
             {
-                // Ledge check origin: just above the wall hit point, shifted slightly back towards the player
-                Vector3 ledgeCheckOrigin = wallHit.point + upDirection * 1.2f - dir * 0.3f;
+                // Check for ledge above the wall hit point
+                Vector3 ledgeCheckOrigin = wallHit.point + upDirection * 1.2f - forward * 0.1f;
 
-                // Smaller sphere radius for precise check
-                float sphereRadius = 0.3f;
+                float ledgeRadius = 0.3f;
+                float ledgeHeight = 1.2f;
 
-                // Shorten ledge check height for better accuracy
-                float ledgeCheckHeight = Mathf.Min(clamberLedgeCheckHeight, 1.5f);
-
-                if (Physics.SphereCast(ledgeCheckOrigin, sphereRadius, -upDirection, out RaycastHit ledgeHit, ledgeCheckHeight * 2f, clamberCheckLayers))
+                if (Physics.SphereCast(ledgeCheckOrigin, ledgeRadius, -upDirection, out RaycastHit ledgeHit, ledgeHeight * 2f, clamberCheckLayers))
                 {
                     if (Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
                     {
@@ -734,6 +727,7 @@ namespace AtrillionGamesLtd
 
             return false;
         }
+
         public bool TryClamberFromGrapple(Vector3 grapplePoint)
         {
             if (CanClamberAtPoint(grapplePoint, out Vector3 ledgePoint))
@@ -741,31 +735,36 @@ namespace AtrillionGamesLtd
                 StartCoroutine(ClamberToLedge(ledgePoint));
                 return true;
             }
-            else
-            {
-                return false;
-            }
-        }
 
+            return false;
+        }
         private bool CanClamberAtPoint(Vector3 grapplePoint, out Vector3 ledgePoint)
         {
             ledgePoint = Vector3.zero;
 
             Vector3 upDirection = -gravityDirection.normalized;
-            Vector3 inwardOffset = -transform.forward * 0.5f; // Look slightly inward
-            Vector3 ledgeCheckOrigin = grapplePoint + upDirection * clamberLedgeCheckHeight + inwardOffset;
+            Vector3 forwardDirection = transform.forward;
 
-            if (Physics.SphereCast(ledgeCheckOrigin, 0.4f, -upDirection, out RaycastHit ledgeHit, clamberLedgeCheckHeight * 2f, clamberCheckLayers))
+            // Slight inward offset to avoid scanning behind wall
+            Vector3 ledgeCheckOrigin = grapplePoint + upDirection * 1.2f - forwardDirection * 0.3f;
+
+            float checkDistance = 1.5f;
+            float sphereRadius = 0.3f;
+
+            if (Physics.SphereCast(ledgeCheckOrigin, sphereRadius, -upDirection, out RaycastHit ledgeHit, checkDistance, clamberCheckLayers))
             {
                 float verticalDelta = Vector3.Dot(ledgeHit.point - grapplePoint, upDirection);
-                if (verticalDelta > 1f && Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
+
+                // Only clamber if the ledge is *above* the grapple point by a small amount
+                if (verticalDelta > 0.5f && verticalDelta <= 1.5f && Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
                 {
                     ledgePoint = ledgeHit.point;
                     return true;
                 }
             }
 
-            Debug.DrawRay(ledgeCheckOrigin, -upDirection * clamberLedgeCheckHeight * 2f, Color.red, 1f);
+            // Debug draw to visualize the ray
+            Debug.DrawRay(ledgeCheckOrigin, -upDirection * checkDistance, Color.red, 1f);
             return false;
         }
 
@@ -778,7 +777,12 @@ namespace AtrillionGamesLtd
             Vector3 upDirection = -gravityDirection.normalized;
 
             Vector3 startPos = transform.position;
-            Vector3 endPos = targetPoint + upDirection * clamberHeightOffset;
+
+            // Offset forward slightly so the player doesn't end up on the edge and fall
+            Vector3 inwardOffset = transform.forward * 0.6f;
+
+            // Move slightly above the ledge, and a bit inward
+            Vector3 endPos = targetPoint + upDirection * clamberHeightOffset + inwardOffset;
 
             float t = 0f;
             while (t < clamberTransitionDuration)
@@ -789,6 +793,7 @@ namespace AtrillionGamesLtd
             }
 
             transform.position = endPos;
+
             isClambering = false;
             canPerformActions = true;
         }
@@ -798,25 +803,20 @@ namespace AtrillionGamesLtd
             if (!Application.isPlaying) return;
 
             Vector3 upDirection = -gravityDirection.normalized;
-            Vector3 origin = transform.position + upDirection * 1.5f;
-            Vector3 dir = transform.forward;
-            float wallCheckDistance = Mathf.Min(clamberWallCheckDistance, 2f);
+            Vector3 forward = transform.forward;
+            Vector3 wallCheckOrigin = transform.position + upDirection * 1.0f + forward * 0.4f;
+            float wallCheckDistance = 1.0f;
 
             Gizmos.color = Color.blue;
-            Gizmos.DrawLine(origin, origin + dir * wallCheckDistance);
+            Gizmos.DrawLine(wallCheckOrigin, wallCheckOrigin + forward * wallCheckDistance);
 
-            Vector3 ledgeCheckOrigin = origin + dir * wallCheckDistance + upDirection * 1.2f - dir * 0.3f;
-            float sphereRadius = 0.3f;
-            float ledgeCheckHeight = Mathf.Min(clamberLedgeCheckHeight, 1.5f);
-
+            Vector3 ledgeCheckOrigin = wallCheckOrigin + forward * wallCheckDistance + upDirection * 1.2f - forward * 0.1f;
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(ledgeCheckOrigin, sphereRadius);
-
+            Gizmos.DrawWireSphere(ledgeCheckOrigin, 0.3f);
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(ledgeCheckOrigin, ledgeCheckOrigin - upDirection * ledgeCheckHeight * 2f);
+            Gizmos.DrawLine(ledgeCheckOrigin, ledgeCheckOrigin - upDirection * 2.4f);
+
         }
 #endif
     }
-
-
 }
