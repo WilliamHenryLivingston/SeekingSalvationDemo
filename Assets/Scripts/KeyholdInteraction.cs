@@ -1,60 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class KeyholeInteraction : MonoBehaviour
+public class KeyholdInteraction : MonoBehaviour
 {
-    public DoorOpen door; 
-    public int requiredShards = 2;
-    private int insertedShards = 0;
-    private bool playerInRange = false;
+    [SerializeField] private Camera playerCam;
+    [SerializeField] private float interactionRange = 3f;
+    [SerializeField] private LayerMask keyholeLayer;
 
-    private void Update()
+    private Keyhole currentKeyhole;
+
+
+    void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        Ray ray = playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        if (Physics.Raycast(ray, out RaycastHit hit, interactionRange, keyholeLayer))
         {
-            TryInsertShard();
-        }
-    }
+            currentKeyhole = hit.collider.GetComponent<Keyhole>();
 
-    void TryInsertShard()
-    {
-        var inventory = PlayerInventory.Instance;
+            if (currentKeyhole != null)
+                currentKeyhole.ShowPrompt(true);
 
-        if (inventory.HasItem("KeyShard"))
-        {
-            inventory.RemoveItemByName("KeyShard");
-            insertedShards++;
-
-            Debug.Log($"Inserted shard {insertedShards}/{requiredShards}");
-
-            if (insertedShards == requiredShards)
-            {
-                UnlockDoor();
-            }
+            if (Input.GetKeyDown(KeyCode.E))
+                currentKeyhole?.TryInsertShard();
         }
         else
         {
-            Debug.Log("No more key shards in inventory.");
+            if (currentKeyhole != null)
+            {
+                currentKeyhole.ShowPrompt(false);
+                currentKeyhole = null;
+            }
         }
-    }
-
-    void UnlockDoor()
-    {
-        Debug.Log("Door unlocked!");
-        door.Unlock();
-       
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-            playerInRange = true;
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-            playerInRange = false;
     }
 }

@@ -37,11 +37,14 @@ public class GrapplingHook : MonoBehaviour
 
     void Update()
     {
+
         // Right-click hold to aim
         if (Input.GetMouseButtonDown(1))
         {
             isAiming = true;
         }
+       
+
 
         if (Input.GetMouseButtonUp(1))
         {

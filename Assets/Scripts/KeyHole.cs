@@ -26,15 +26,24 @@ public class Keyhole : MonoBehaviour
 
     public void TryInsertShard()
     {
-        if (doorOpened) return;
+        if (doorOpened)
+        {
+            Debug.Log("Door is already open. No need to insert.");
+            return;
+        }
 
         var inventory = PlayerInventory.Instance;
 
-        if (inventory != null && inventory.HasItem("KeyShard"))
+        if (inventory == null)
+        {
+            Debug.LogError("PlayerInventory.Instance is null!");
+            return;
+        }
+
+        if (inventory.HasItem("KeyShard"))
         {
             inventory.RemoveItemByName("KeyShard");
             insertedShards++;
-
             Debug.Log($"Shard inserted! ({insertedShards}/{requiredShards})");
 
             if (insertedShards >= requiredShards)
@@ -47,6 +56,7 @@ public class Keyhole : MonoBehaviour
             Debug.Log("No key shards in inventory.");
         }
     }
+
 
     private void OpenDoor()
     {

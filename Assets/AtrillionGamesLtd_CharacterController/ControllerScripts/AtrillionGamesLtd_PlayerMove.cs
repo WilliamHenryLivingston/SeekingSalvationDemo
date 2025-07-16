@@ -775,13 +775,8 @@ namespace AtrillionGamesLtd
             playerBodyRigidBody.velocity = Vector3.zero;
 
             Vector3 upDirection = -gravityDirection.normalized;
-
             Vector3 startPos = transform.position;
-
-            // Offset forward slightly so the player doesn't end up on the edge and fall
             Vector3 inwardOffset = transform.forward * 0.6f;
-
-            // Move slightly above the ledge, and a bit inward
             Vector3 endPos = targetPoint + upDirection * clamberHeightOffset + inwardOffset;
 
             float t = 0f;
@@ -796,7 +791,9 @@ namespace AtrillionGamesLtd
 
             isClambering = false;
             canPerformActions = true;
+            isGrappling = false;  //  Reset grappling state here
         }
+
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
