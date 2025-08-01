@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 7034972292966936631}
   - component: {fileID: 7051218761588931482}
   - component: {fileID: 2750209919452310115}
-  m_Layer: 0
+  - component: {fileID: 3054626069351612190}
+  m_Layer: 7
   m_Name: PressurePlate
-  m_TagString: Untagged
+  m_TagString: PickUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -62,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: ed8c42faba1884147b0e56c1ad489c1f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -103,5 +104,19 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 10.233531, z: 1}
+  m_Center: {x: 0, y: 4.6167655, z: 0}
+--- !u!114 &3054626069351612190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7857936889942235019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 706e569ab61a7104b8540bf76094c1e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spearShooter: {fileID: 0}
+  delayBeforeFire: 0.3
