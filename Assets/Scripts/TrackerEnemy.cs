@@ -1,12 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 using System;
 
 public class TrackerEnemy : MonoBehaviour
 {
-    public float moveSpeed = 3f;
-    public float reachDistance = 1f;
+    [Header("Enemy Variant Settings")]
+    public EnemyData enemyProfile;
+
+    private float moveSpeed;
+    private float reachDistance;
 
     private List<GameObject> breadcrumbTrail;
     private int currentBreadcrumbIndex = 0;
@@ -17,7 +19,16 @@ public class TrackerEnemy : MonoBehaviour
 
     private void Start()
     {
-        // Try to find the player and their breadcrumb trail
+        if (enemyProfile != null)
+        {
+            moveSpeed = enemyProfile.moveSpeed;
+
+            // Optional: change color/visual for clarity
+            Renderer rend = GetComponentInChildren<Renderer>();
+            if (rend != null) rend.material.color = enemyProfile.enemyColor;
+        }
+
+        // Find the player and breadcrumb trail
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
@@ -38,11 +49,7 @@ public class TrackerEnemy : MonoBehaviour
         }
     }
 
-    // Called by spawner to define where in the trail to start
-    public void SetStartingIndex(int index)
-    {
-        currentBreadcrumbIndex = index;
-    }
+    public void SetStartingIndex(int index) => currentBreadcrumbIndex = index;
 
     private void Update()
     {
@@ -51,7 +58,6 @@ public class TrackerEnemy : MonoBehaviour
 
         if (targetBreadcrumb == null)
         {
-            // Skip null entries in the trail
             while (currentBreadcrumbIndex < breadcrumbTrail.Count && breadcrumbTrail[currentBreadcrumbIndex] == null)
             {
                 currentBreadcrumbIndex++;
@@ -63,12 +69,11 @@ public class TrackerEnemy : MonoBehaviour
 
         if (targetBreadcrumb == null) return;
 
-        // Move toward the current breadcrumb
+        // Move toward breadcrumb
         Vector3 dir = (targetBreadcrumb.position - transform.position).normalized;
         transform.position += dir * moveSpeed * Time.deltaTime;
 
-        float dist = Vector3.Distance(transform.position, targetBreadcrumb.position);
-        if (dist <= reachDistance)
+        if (Vector3.Distance(transform.position, targetBreadcrumb.position) <= reachDistance)
         {
             currentBreadcrumbIndex++;
             targetBreadcrumb = null;
@@ -85,7 +90,7 @@ public class TrackerEnemy : MonoBehaviour
 
     private void KillPlayer()
     {
-        Debug.Log("Player caught by enemy!");
+        Debug.Log($"{enemyProfile.enemyName} caught the player!");
         GameManager.Instance.GameOver();
     }
 
@@ -94,6 +99,4 @@ public class TrackerEnemy : MonoBehaviour
         OnDespawned?.Invoke();
         Destroy(gameObject);
     }
-
-
 }
