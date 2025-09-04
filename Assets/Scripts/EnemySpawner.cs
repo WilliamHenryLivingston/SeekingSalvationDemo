@@ -1,11 +1,16 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject enemyPrefab;
-    [SerializeField] private PlayerBreadcrumbTrail player; // Updated reference
+    [Header("Enemy Variants")]
+    [SerializeField] private GameObject[] enemyPrefabs;  // Array of variants
+
+    [Header("Player Tracking")]
+    [SerializeField] private PlayerBreadcrumbTrail player;
     [SerializeField] private int breadcrumbsBehindPlayer = 10;
+
+    [Header("Spawn Timing")]
     [SerializeField] private float minSpawnTime = 50f;
     [SerializeField] private float maxSpawnTime = 75f;
 
@@ -13,7 +18,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
-        // Automatically find the player and its breadcrumb trail script
+        // Find the player and its breadcrumb trail script
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
@@ -57,18 +62,28 @@ public class EnemySpawner : MonoBehaviour
 
         GameObject spawnPoint = player.breadcrumbsTrail[spawnIndex];
 
-        if (spawnPoint != null)
+        if (spawnPoint != null && enemyPrefabs.Length > 0)
         {
-            currentEnemy = Instantiate(enemyPrefab, spawnPoint.transform.position, Quaternion.identity);
+            GameObject enemyToSpawn = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+
+            currentEnemy = Instantiate(enemyToSpawn, spawnPoint.transform.position, Quaternion.identity);
 
             TrackerEnemy tracker = currentEnemy.GetComponent<TrackerEnemy>();
             if (tracker != null)
             {
                 tracker.SetStartingIndex(spawnIndex + 1);
                 tracker.OnDespawned += HandleEnemyDespawned;
-            }
 
-            Debug.Log("Something has caught your scent!");
+                // Print special message
+                if (tracker.enemyProfile != null && !string.IsNullOrEmpty(tracker.enemyProfile.spawnMessage))
+                {
+                    Debug.Log(tracker.enemyProfile.spawnMessage);
+                }
+                else
+                {
+
+                }
+            }
         }
     }
 

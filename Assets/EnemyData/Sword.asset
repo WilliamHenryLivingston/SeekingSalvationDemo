@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95fa9d9abcba013409493a0cafecb7bf, type: 3}
   m_Name: Sword
   m_EditorClassIdentifier: 
-  enemyName: Default Enemy
-  moveSpeed: 3
-  enemyColor: {r: 1, g: 1, b: 1, a: 1}
+  enemyName: Cold Hard Metal
+  moveSpeed: 2
+  reachDistance: 0.35
+  enemyColor: {r: 0.8050314, g: 0.16961338, b: 0.23699765, a: 1}
+  spawnMessage: 'A magnetic energy connects you. '

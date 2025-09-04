@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95fa9d9abcba013409493a0cafecb7bf, type: 3}
   m_Name: Dog
   m_EditorClassIdentifier: 
-  enemyName: Default Enemy
-  moveSpeed: 3
-  enemyColor: {r: 1, g: 1, b: 1, a: 1}
+  enemyName: A Fury of Claws and Teeth
+  moveSpeed: 8
+  reachDistance: 0.35
+  enemyColor: {r: 0.48427665, g: 0.3630175, b: 0.16599411, a: 1}
+  spawnMessage: A fury of claws and teeth has caught your scent!

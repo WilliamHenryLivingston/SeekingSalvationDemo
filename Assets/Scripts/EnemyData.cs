@@ -7,5 +7,7 @@ public class EnemyData : ScriptableObject
 {
     public string enemyName = "Default Enemy";
     public float moveSpeed = 3f;
+    public float reachDistance = 0.35f;
     public Color enemyColor = Color.white; // Optional for visual difference
+    [TextArea] public string spawnMessage = "Something has caught your scent!";
 }

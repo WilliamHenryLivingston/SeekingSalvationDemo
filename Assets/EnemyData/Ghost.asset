@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95fa9d9abcba013409493a0cafecb7bf, type: 3}
   m_Name: Ghost
   m_EditorClassIdentifier: 
-  enemyName: Default Enemy
-  moveSpeed: 3
-  enemyColor: {r: 1, g: 1, b: 1, a: 1}
+  enemyName: 'An Envious Presence '
+  moveSpeed: 4
+  reachDistance: 0.35
+  enemyColor: {r: 0.899371, g: 0.899371, b: 0.899371, a: 1}
+  spawnMessage: 'An envious spirit wants to consume your light. '
