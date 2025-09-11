@@ -15,3 +15,5 @@ MonoBehaviour:
   itemName: KeyShard
   itemIcon: {fileID: 21300000, guid: 67a9c4baa4e87f84eb5157a1cc842c5e, type: 3}
   itemPrefab: {fileID: 4138014043022927550, guid: c8971bd5333f458498a5cd6910798dbc, type: 3}
+  weight: 1
+  spiritualSignificance: 10
