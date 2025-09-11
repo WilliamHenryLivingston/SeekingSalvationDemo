@@ -3,34 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-// Remove 'using static InventoryItem;' if InventoryItem is a class/ScriptableObject now
 
 public class PlayerInventory : MonoBehaviour
 {
     public static PlayerInventory Instance { get; private set; }
+
+    [Header("Inventory Data")]
     public List<InventoryItem> inventoryItems = new List<InventoryItem>();
     public int currency = 0;
     public int coins = 0;
-
-    public Transform inventoryUIParent;     // Assign your inventory panel (e.g., a Panel UI element)
-    public GameObject inventorySlotPrefab;
-    public float dropOffset = 1.5f;       // How far in front of the player to drop the item
-
-    private RectTransform inventoryPanelRect; // Store the RectTransform for bounds checking
-
     public int maxInventorySize = 10;
+
+    [Header("UI References")]
+    public Transform inventoryUIParent;
+    public GameObject inventorySlotPrefab;
+    private RectTransform inventoryPanelRect;
+
+    [Header("Drop Settings")]
+    public float dropOffset = 1.5f;
+
+    // New Properties (Step Two)
+    public float TotalWeight { get; private set; }
+    public int TotalSpiritualSignificance { get; private set; }
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            // DontDestroyOnLoad(gameObject); // Optional: if your inventory persists between scenes
         }
         else
         {
             Destroy(gameObject);
-            return; // Added return to prevent further execution in Awake if destroyed
+            return;
         }
 
         // Get the RectTransform of the inventory panel
@@ -47,11 +52,14 @@ public class PlayerInventory : MonoBehaviour
 
         if (inventoryItems.Count >= maxInventorySize)
         {
-            Debug.LogWarning("Inventory is full Cannot pick up" + item.itemName);
-                return false;
+            Debug.LogWarning("Inventory is full. Cannot pick up " + item.itemName);
+            return false;
         }
+
         inventoryItems.Add(item);
         Debug.Log(item.itemName + " added to inventory.");
+
+        RecalculateStats(); // Update stats when items are added
 
         //UpdateUI
         AddItemToUI(item);
@@ -68,14 +76,14 @@ public class PlayerInventory : MonoBehaviour
         }
 
         GameObject newSlot = Instantiate(inventorySlotPrefab, inventoryUIParent);
-        newSlot.name = item.itemName + "_Slot"; // Helps with debugging
+        newSlot.name = item.itemName + "_Slot";
 
-        Image itemImage = newSlot.GetComponentInChildren<Image>(); // More robust: find Image in children
+        Image itemImage = newSlot.GetComponentInChildren<Image>();
 
         if (itemImage != null)
         {
             itemImage.sprite = item.itemIcon;
-            itemImage.enabled = true; // Make sure image is enabled
+            itemImage.enabled = true;
         }
         else
         {
@@ -85,91 +93,80 @@ public class PlayerInventory : MonoBehaviour
         DraggableItem draggableItem = newSlot.GetComponent<DraggableItem>();
         if (draggableItem == null)
         {
-            draggableItem = newSlot.AddComponent<DraggableItem>(); // Add Drag functionality
+            draggableItem = newSlot.AddComponent<DraggableItem>();
         }
 
-        // --- Crucial Setup for DraggableItem ---
-        draggableItem.item = item;                      // Link item data
-        draggableItem.image = itemImage;                // Link the Image component
-        draggableItem.originalParent = inventoryUIParent; // Set the parent
-        draggableItem.inventoryPanelRect = this.inventoryPanelRect; // Pass the panel bounds
-        // --- End Setup ---
+        draggableItem.item = item;
+        draggableItem.image = itemImage;
+        draggableItem.originalParent = inventoryUIParent;
+        draggableItem.inventoryPanelRect = this.inventoryPanelRect;
     }
 
-    // Called by DraggableItem when an item is dropped outside the inventory panel
     public bool DropItemToWorld(InventoryItem itemToDrop)
     {
         if (itemToDrop == null) return false;
 
-        // 1. Check if the item has a prefab to instantiate
         if (itemToDrop.itemPrefab == null)
         {
             Debug.LogWarning($"Item '{itemToDrop.itemName}' cannot be dropped because it has no itemPrefab assigned.");
-            return false; // Indicate failure
+            return false;
         }
 
-        // 2. Remove the item from the core inventory list
         bool removed = inventoryItems.Remove(itemToDrop);
         if (!removed)
         {
-            // This shouldn't happen if the DraggableItem's reference was correct, but good to check
             Debug.LogError($"Failed to remove item '{itemToDrop.itemName}' from inventory list during drop.");
-            return false; // Indicate failure
+            return false;
         }
 
         Debug.Log($"Removed '{itemToDrop.itemName}' from inventory list.");
 
-        // 3. Instantiate the item's prefab in the world
-        // Calculate drop position (e.g., slightly in front of the player)
-        Vector3 dropPosition = transform.position + (transform.forward * dropOffset);
+        RecalculateStats(); // Update stats when items are dropped
 
-        // Optional: Add a small vertical offset so it doesn't clip into the ground immediately
+        Vector3 dropPosition = transform.position + (transform.forward * dropOffset);
         dropPosition += Vector3.up * 0.2f;
 
-        // Optional: Raycast down to find the actual ground position
         if (Physics.Raycast(dropPosition + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f))
         {
-            dropPosition = hit.point + Vector3.up * 0.1f; // Place slightly above the hit point
+            dropPosition = hit.point + Vector3.up * 0.1f;
         }
 
-        Instantiate(itemToDrop.itemPrefab, dropPosition, Quaternion.identity); // Use default rotation or item specific rotation
+        Instantiate(itemToDrop.itemPrefab, dropPosition, Quaternion.identity);
         Debug.Log($"Instantiated '{itemToDrop.itemName}' prefab at {dropPosition}.");
 
-        // 4. The DraggableItem script will handle destroying the UI GameObject
-
-        return true; // Indicate success
+        return true;
     }
 
-    // Optional: Method to remove item by reference (e.g., if picked up by another system)
     public void RemoveItem(InventoryItem itemToRemove)
     {
         if (inventoryItems.Remove(itemToRemove))
         {
             Debug.Log($"Removed {itemToRemove.itemName} from inventory.");
-            // Find and destroy the corresponding UI slot
+            RecalculateStats(); // Update stats when items are removed
+
             foreach (Transform childSlot in inventoryUIParent)
             {
                 DraggableItem dragItem = childSlot.GetComponent<DraggableItem>();
                 if (dragItem != null && dragItem.item == itemToRemove)
                 {
                     Destroy(childSlot.gameObject);
-                    break; // Found and destroyed, exit loop
+                    break;
                 }
             }
         }
     }
+
     public bool HasItem(string itemName)
     {
         return inventoryItems.Any(item => item.itemName == itemName);
     }
 
-    // Removes the first item matching a given name
     public bool RemoveItemByName(string itemName)
     {
         var itemToRemove = inventoryItems.FirstOrDefault(item => item.itemName == itemName);
         if (itemToRemove != null)
         {
-            RemoveItem(itemToRemove); // Calls your existing RemoveItem method
+            RemoveItem(itemToRemove);
             return true;
         }
 
@@ -177,4 +174,18 @@ public class PlayerInventory : MonoBehaviour
         return false;
     }
 
+    // New Method for Step Two
+    private void RecalculateStats()
+    {
+        TotalWeight = 0f;
+        TotalSpiritualSignificance = 0;
+
+        foreach (var item in inventoryItems)
+        {
+            TotalWeight += item.weight;
+            TotalSpiritualSignificance += item.spiritualSignificance;
+        }
+
+        Debug.Log($"[Inventory Stats] Weight: {TotalWeight}, Spiritual: {TotalSpiritualSignificance}");
+    }
 }

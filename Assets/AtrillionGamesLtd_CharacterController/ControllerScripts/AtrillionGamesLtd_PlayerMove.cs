@@ -44,7 +44,9 @@ namespace AtrillionGamesLtd
         [Space]
         [SerializeField] private float maxWalkableSlope = 45.0f;
         [SerializeField] private float airtimeSpeedCap = 50;
-        [SerializeField] private float playerSpeed = 5.0f;
+        [SerializeField] private float basePlayerSpeed = 5.0f; // replaces playerSpeed
+        [SerializeField] private float weightPenaltyPerUnit = 0.1f; // how much speed is lost per unit of weight
+        private PlayerInventory playerInventory; // reference to inventory
         [SerializeField] private float sprintSpeedMultiplier = 2.0f;
         [SerializeField] private float crouchSpeedMultiplier = 0.5f;
         [SerializeField] private float jumpHeight = 10.0f;
@@ -220,6 +222,9 @@ namespace AtrillionGamesLtd
             stepHeight = Mathf.Min(stepHeight, playerStandingHeight-playerCrouchHeight);
 
             setHeadPosition(playerStandingHeight);
+
+            // Find inventory reference
+            playerInventory = FindObjectOfType<PlayerInventory>();
         }
 
         void RotateTransformToDirection(Transform _transform, Vector3 targetDirection, float rotationSpeed = 10f)
@@ -390,7 +395,7 @@ namespace AtrillionGamesLtd
             if (isCrouching)
             {
                 setHeadPosition(playerCrouchHeight); // move the player head down to crouched height
-                if (playerVelocity.magnitude > playerSpeed) // is the player crouches while moving faster than the players default walking speed it initiaites a slide
+                if (playerVelocity.magnitude > basePlayerSpeed) // is the player crouches while moving faster than the players default walking speed it initiaites a slide
                 {
                     isSliding = true;
                 }
@@ -405,7 +410,10 @@ namespace AtrillionGamesLtd
             }
             else
             {
-                setHeadPosition(playerStandingHeight); // move the player head back up to standing height
+                setHeadPosition(playerStandingHeight);
+
+                // Find inventory reference
+                playerInventory = FindObjectOfType<PlayerInventory>(); // move the player head back up to standing height
                 isSliding = false;
             }
         }
@@ -570,7 +578,14 @@ namespace AtrillionGamesLtd
 
             // ------- Apply movement speed modifiers (sprint, crouch, sliding etc.) --------
 
-            float playerMovementSpeed = playerSpeed;
+            // Calculate movement speed based on inventory weight
+            float penalty = 0f;
+            if (playerInventory != null)
+            {
+                penalty = playerInventory.TotalWeight * weightPenaltyPerUnit;
+            }
+
+            float playerMovementSpeed = Mathf.Max(1f, basePlayerSpeed - penalty);
 
             handleCrouching(ref playerMovementSpeed);
 
