@@ -1,3 +1,4 @@
+//Copyright 2025 William Livingston
 using AtrillionGamesLtd;
 using System.Collections;
 using System.Collections.Generic;

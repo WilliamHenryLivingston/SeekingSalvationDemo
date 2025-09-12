@@ -1,3 +1,4 @@
+//Copyright 2025 William Livingston
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +23,7 @@ public class DivineTree : MonoBehaviour
             if (enemy != null)
             {
                 enemy.GetComponent<TrackerEnemy>().Despawn();
-                Debug.Log("Something has lost your scent");
+                Debug.Log("A divine presence protects you");
             }
         }
     }

@@ -1,3 +1,4 @@
+//Copyright 2025 William Livingston
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,14 +6,13 @@ using UnityEngine;
 public class DivineTreeCharger : MonoBehaviour
 {
     public GameObject hiddenObject; // Assign in Inspector
-    public int chargesNeeded = 5;
+    public int chargesNeeded = 300;
 
     private int currentCharges = 0;
     private bool playerInRange = false;
-    private GameObject player;
+    private PlayerInventory playerInventory; // reference to inventory
 
     public DivineTreeCharger nextTree;
-
     public Animator treeAnimator;
 
     void OnTriggerEnter(Collider other)
@@ -20,7 +20,7 @@ public class DivineTreeCharger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
-            player = other.gameObject;
+            playerInventory = other.GetComponent<PlayerInventory>();
         }
     }
 
@@ -29,7 +29,7 @@ public class DivineTreeCharger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            player = null;
+            playerInventory = null;
         }
     }
 
@@ -43,24 +43,31 @@ public class DivineTreeCharger : MonoBehaviour
 
     void TryChargeTree()
     {
-        var inventory = PlayerInventory.Instance;
-        if (inventory.HasItem("Energy"))
+        // Look for a shrine in range
+        ShrineTable shrine = FindObjectOfType<ShrineTable>();
+        if (shrine == null)
         {
-            inventory.RemoveItemByName("Energy");
-            currentCharges++;
-
-            Debug.Log($"Divine Tree charged! ({currentCharges}/{chargesNeeded})");
-
-            if (currentCharges == chargesNeeded)
-            {
-                ActivateTree();
-            }
+            Debug.Log("No shrine found near tree.");
+            return;
         }
-        else
+
+        int spiritualEnergy = shrine.CollectStoredValue();
+        if (spiritualEnergy <= 0)
         {
-            Debug.Log("You need energy to power the tree.");
+            Debug.Log("Nothing has been placed on the shrine.");
+            return;
+        }
+
+        currentCharges += spiritualEnergy;
+
+        Debug.Log($"Offered {spiritualEnergy} spiritual energy. Tree progress: {currentCharges}/{chargesNeeded}");
+
+        if (currentCharges >= chargesNeeded)
+        {
+            ActivateTree();
         }
     }
+
     void ActivateTree()
     {
         Debug.Log("Divine Tree fully powered!");
@@ -75,6 +82,7 @@ public class DivineTreeCharger : MonoBehaviour
         if (hiddenObject != null)
             hiddenObject.SetActive(true);
     }
+
     IEnumerator RevealAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);

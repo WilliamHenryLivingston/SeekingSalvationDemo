@@ -1,3 +1,4 @@
+//Copyright 2025 William Livingston
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI; 

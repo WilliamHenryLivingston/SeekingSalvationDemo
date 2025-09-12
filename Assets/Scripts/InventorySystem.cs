@@ -1,3 +1,4 @@
+//Copyright 2025 William Livingston
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -188,4 +189,35 @@ public class PlayerInventory : MonoBehaviour
 
         Debug.Log($"[Inventory Stats] Weight: {TotalWeight}, Spiritual: {TotalSpiritualSignificance}");
     }
+
+    // --- SHRINE SUPPORT METHODS ---
+    public InventoryItem GetFirstItem()
+    {
+        if (inventoryItems.Count == 0)
+            return null;
+        return inventoryItems[0];
+    }
+
+    public void RemoveFirstItem()
+    {
+        if (inventoryItems.Count == 0) return;
+
+        InventoryItem itemToRemove = inventoryItems[0];
+        inventoryItems.RemoveAt(0);
+
+        Debug.Log($"Removed {itemToRemove.itemName} from inventory (first slot).");
+        RecalculateStats();
+
+        // Also remove from UI
+        foreach (Transform childSlot in inventoryUIParent)
+        {
+            DraggableItem dragItem = childSlot.GetComponent<DraggableItem>();
+            if (dragItem != null && dragItem.item == itemToRemove)
+            {
+                Destroy(childSlot.gameObject);
+                break;
+            }
+        }
+    }
+
 }
