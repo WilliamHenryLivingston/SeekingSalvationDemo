@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: 'Thick Cloak '
   itemIcon: {fileID: 21300000, guid: 38fd9688bbb61d04f9452d0b59a150a2, type: 3}
-  itemPrefab: {fileID: 0}
+  itemPrefab: {fileID: 5149920081926245035, guid: e55a7df77c8896a41a0eedc005d97795, type: 3}
   weight: 3
   spiritualSignificance: 5

@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Carved Gem
   itemIcon: {fileID: 21300000, guid: 38fd9688bbb61d04f9452d0b59a150a2, type: 3}
-  itemPrefab: {fileID: 0}
+  itemPrefab: {fileID: 5149920081926245035, guid: 342098d1b8cf65649b739bc22dd7e1db, type: 3}
   weight: 3
   spiritualSignificance: 20
