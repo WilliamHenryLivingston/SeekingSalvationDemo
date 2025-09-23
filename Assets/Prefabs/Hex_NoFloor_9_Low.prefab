@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: ed8c42faba1884147b0e56c1ad489c1f, type: 2}
     - target: {fileID: 919132149155446097, guid: 651748f0de88c6346a3a3309100be0d1, type: 3}
       propertyPath: m_Name
-      value: Hex_NoFloor_14 1
+      value: Hex_NoFloor_9_Low
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 651748f0de88c6346a3a3309100be0d1, type: 3}
       propertyPath: m_IsActive
