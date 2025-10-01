@@ -8,9 +8,9 @@ namespace AtrillionGamesLtd
 
     public class AtrillionGamesLtd_PlayerMove : MonoBehaviour
     {
-        private GameObject wherePlayerLastStood; //Used for tracking moving parts and moving platforms
+        private GameObject wherePlayerLastStood;
+        //Used for tracking moving parts and moving platforms
         private ATG_PlayerControls inputActions;
-
         [SerializeField] private Transform playerCamera;
         [SerializeField] private Transform playerCameraHolder;
         [Space]
@@ -45,8 +45,10 @@ namespace AtrillionGamesLtd
         [SerializeField] private float maxWalkableSlope = 45.0f;
         [SerializeField] private float airtimeSpeedCap = 50;
         [SerializeField] private float basePlayerSpeed = 5.0f; // replaces playerSpeed
-        [SerializeField] private float weightPenaltyPerUnit = 0.1f; // how much speed is lost per unit of weight
-        private PlayerInventory playerInventory; // reference to inventory
+        [SerializeField] private float weightPenaltyPerUnit = 0.1f;
+        // how much speed is lost per unit of weight
+        private PlayerInventory playerInventory;
+        // reference to inventory
         [SerializeField] private float sprintSpeedMultiplier = 2.0f;
         [SerializeField] private float crouchSpeedMultiplier = 0.5f;
         [SerializeField] private float jumpHeight = 10.0f;
@@ -64,7 +66,8 @@ namespace AtrillionGamesLtd
         [SerializeField] private float playerAirResistance = 0.01f;
         [SerializeField] private float playerSlideControl = 2.5f;
         [SerializeField] private float playerWallRunControl = 5f;
-        [SerializeField] private float playerWallRunFallOff = 2f; // At what rate does the player lose grip with the wall
+        [SerializeField] private float playerWallRunFallOff = 2f;
+        // At what rate does the player lose grip with the wall
         [SerializeField] private float playerWallRunJumpPower = 10f;
         [Space]
 
@@ -94,6 +97,20 @@ namespace AtrillionGamesLtd
 
         private CapsuleCollider playerBodyCollider;
         private Rigidbody playerBodyRigidBody;
+
+        // ** Custom Player Input States **
+        // Renamed 'jumpInputDown' for clarity in buffer logic
+        private bool jumpInputHeld = false; // True for every frame the jump button is held
+
+        [Space]
+        [Header("Grounding & Jump Fixes")]
+        [SerializeField] private float groundCheckPadding = 0.05f;
+        // Small buffer to ensure raycast hits when player is still or resting on geometry.
+
+        // ** JUMP INPUT BUFFER FIELDS **
+        [SerializeField] private float jumpBufferTime = 0.15f; // Time in seconds to hold the input
+        private float jumpBufferTimer = 0f; // The timer itself
+        // ** END JUMP INPUT BUFFER FIELDS **
 
         void Awake()
         {
@@ -160,18 +177,18 @@ namespace AtrillionGamesLtd
             physMaterial.bounciness = 0f;
             physMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
             physMaterial.bounceCombine = PhysicMaterialCombine.Minimum;
-
             // Assign the material to the collider
             playerBodyCollider.material = physMaterial;
-
             // Make sure the player body and player head don't roll or use gravity since that will also be calculated internally
-            playerBodyRigidBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+            playerBodyRigidBody.constraints = RigidbodyConstraints.FreezeRotationX |
+            RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
             playerBodyRigidBody.useGravity = false;
             playerBodyRigidBody.interpolation = RigidbodyInterpolation.Interpolate;
 
             if (playerCamera == null)
             {
-                playerCamera = Camera.main.transform; // If no camera is assigned it will just use whatever the main scene camera is as the player camera
+                playerCamera = Camera.main.transform;
+                // If no camera is assigned it will just use whatever the main scene camera is as the player camera
             }
 
             // Check if the parent of the camera is the CameraHolder
@@ -180,13 +197,16 @@ namespace AtrillionGamesLtd
             {
                 GameObject playerCameraHolderGameObject = new GameObject("CameraHolder");
                 playerCameraHolderGameObject.transform.SetParent(transform);  // Set null as parent
-                playerCamera.transform.SetParent(playerCameraHolderGameObject.transform);  // Set null as parent
+                playerCamera.transform.SetParent(playerCameraHolderGameObject.transform);
+                // Set null as parent
                 playerCameraHolder = playerCameraHolderGameObject.transform;
             }
             else
             {
-                playerCameraHolder.transform.SetParent(transform);  // Set null as parent
-                playerCamera.transform.SetParent(playerCameraHolder);  // Set null as parent
+                playerCameraHolder.transform.SetParent(transform);
+                // Set null as parent
+                playerCamera.transform.SetParent(playerCameraHolder);
+                // Set null as parent
             }
 
             // Reset the transform of characterHolder
@@ -200,18 +220,19 @@ namespace AtrillionGamesLtd
             playerCamera.localScale = Vector3.one;
 
             // uncomment if you want the player to stat with a default FOV
-            //setPlayerFOV(90f); // sets the initial player FOV
+            //setPlayerFOV(90f);
+            // sets the initial player FOV
         }
 
         private void Start()
         {
             AddScriptsIfMissing();
-
             wherePlayerLastStood = new GameObject("wherePlayerLastStood"); // create the player holder (used for tracking moving platforms that the player might be standing on)
-            wherePlayerLastStood.transform.SetParent(null);  // Set null as parent
+            wherePlayerLastStood.transform.SetParent(null);
+            // Set null as parent
 
-            Cursor.lockState = CursorLockMode.Locked;
-
+            // FIX: Cursor ambiguity issue (CS0104) 
+            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             playerBodyCollider.height = playerCrouchHeight;
             playerBodyCollider.radius = playerRadius;
 
@@ -222,7 +243,6 @@ namespace AtrillionGamesLtd
             stepHeight = Mathf.Min(stepHeight, playerStandingHeight-playerCrouchHeight);
 
             setHeadPosition(playerStandingHeight);
-
             // Find inventory reference
             playerInventory = FindObjectOfType<PlayerInventory>();
         }
@@ -237,8 +257,8 @@ namespace AtrillionGamesLtd
                 Vector3 stepTargetDirection = Vector3.Slerp(-_transform.up, targetDirection, Mathf.Clamp01((rotationSpeed*10f)/(angleToTarget)));
                 // Calculate the rotation that aligns the transform that points down with stepTargetDirection
                 Quaternion targetRotation = Quaternion.FromToRotation(-_transform.up, stepTargetDirection);
-
-                // uncomment for debugging gravity alignment issues, It shows 2 rays. Blue for where the gravity is pointing and green for where the player's "down" vector is pointing
+                // uncomment for debugging gravity alignment issues, It shows 2 rays.
+                // Blue for where the gravity is pointing and green for where the player's "down" vector is pointing
                 //Debug.DrawRay(_transform.position, targetDirection, Color.blue, Time.fixedDeltaTime);
                 //Debug.DrawRay(_transform.position, -_transform.up, Color.green, Time.fixedDeltaTime);
 
@@ -254,16 +274,13 @@ namespace AtrillionGamesLtd
 
             float yRotation = playerCamera.localEulerAngles.x - (mouseY * sensitivity);
             float xRotation = playerCamera.localEulerAngles.y + (mouseX * sensitivity);
-
             // Clamp the vertical rotation between -90 and 90 degrees (straight down and straight up)
             if (yRotation > 180) // Because Euler angles wrap around at 360 degrees
                 yRotation -= 360;
-
             yRotation = Mathf.Clamp(yRotation, -89.9f, 89.9f);
 
             // Apply the rotation
             RotateTransformToDirection(playerCameraHolder, gravityDirection, rotateTowardsGravityRate * Time.deltaTime);
-
             // Calculate the horizontal (yaw) rotation in the perpendicular plane to gravity (mouseX input)
             float verticalRotation = mouseY * sensitivity;
             float horizontalRotation = mouseX * sensitivity;
@@ -279,6 +296,7 @@ namespace AtrillionGamesLtd
             { // Ground To Ground transition
                 if (lastSurface != Surface)
                 {
+
                     transform.SetParent(null);
                     wherePlayerLastStood.transform.position = Surface.position;
                     wherePlayerLastStood.transform.rotation = Surface.rotation;
@@ -297,6 +315,7 @@ namespace AtrillionGamesLtd
             {
                 if (lastSurface)
                 { // Ground to Air transition
+
                     localAirSpeedCap = Mathf.Min(absolutePlayerVelocity.magnitude, airtimeSpeedCap);
                     playerVelocity += absolutePlayerVelocity;
                     //print("OffFloor " + absolutePlayerVelocity);
@@ -316,11 +335,14 @@ namespace AtrillionGamesLtd
         void whatIsPlayerStoodOn(ref Vector3 slopeDirection, ref Vector3 slideDirection, ref float groundFriction)
         {
             //Debug.DrawRay(playerCamera.position, playerCamera.forward*10f, Color.green, 5f);
-
             isGrounded = false;
             RaycastHit directlyGrounded;
             Debug.DrawRay(transform.position, gravityDirection * playerStandingHeight, Color.cyan, 5f);
-            if (Physics.Raycast(transform.position, gravityDirection, out directlyGrounded, (headOffset/2)+stepHeight+0.01f, floorlayers))
+
+            // FIX: Use groundCheckPadding to prevent sticky/inconsistent jump
+            float rayDistance = (headOffset/2) + stepHeight + groundCheckPadding;
+
+            if (Physics.Raycast(transform.position, gravityDirection, out directlyGrounded, rayDistance, floorlayers))
             {
                 isGrounded = true;
                 standingOnMovingSurface(directlyGrounded.collider.transform, directlyGrounded.point);
@@ -329,13 +351,11 @@ namespace AtrillionGamesLtd
                 float angle = Vector3.Angle(directlyGrounded.normal, -gravityDirection);
 
                 isGrounded = angle < maxWalkableSlope || isGrounded;
-
                 if (angle < maxWalkableSlope)
                 { // If this specific contact point is a grounded point
                     slopeNormal = directlyGrounded.normal;
                     slopeDirection = Vector3.ProjectOnPlane(gravityDirection, directlyGrounded.normal); // slope direction
                     slideDirection = slopeDirection * Vector3.Dot(gravityDirection, slopeDirection);
-
                     // Get the PhysicMaterial from the hit object
                     Collider hitCollider = directlyGrounded.collider;
                     if (hitCollider != null && hitCollider.material != null)
@@ -362,13 +382,13 @@ namespace AtrillionGamesLtd
                 { // move down slopes or stairs rather than falling down them
                     move = Vector3.ProjectOnPlane(move, slopeNormal);
                 }
-                move = move.normalized; // Normalize to prevent diagonal speed boost (Respects real max speed rather than getting sqrt(2)*max speed as the max speed when moving diagonally)
+                move = move.normalized;
+                // Normalize to prevent diagonal speed boost (Respects real max speed rather than getting sqrt(2)*max speed as the max speed when moving diagonally)
                 pointInWallRun = 0f;
             }
             else
             {
                 Vector3 flattenedMove = Vector3.ProjectOnPlane(move, gravityDirection).normalized;
-
                 if (isWallRunning)
                 {
                     handleWallRunning(ref move, flattenedMove);
@@ -384,7 +404,8 @@ namespace AtrillionGamesLtd
 
         void handleWallRunning(ref Vector3 move, Vector3 flattenedMove)
         {
-            move = Vector3.ProjectOnPlane(move, slopeNormal); // slope direction
+            move = Vector3.ProjectOnPlane(move, slopeNormal);
+            // slope direction
             move = Vector3.Lerp(move, flattenedMove, 0.1f);
             move = move.normalized;
             pointInWallRun += Time.fixedDeltaTime;
@@ -394,7 +415,8 @@ namespace AtrillionGamesLtd
         {
             if (isCrouching)
             {
-                setHeadPosition(playerCrouchHeight); // move the player head down to crouched height
+                setHeadPosition(playerCrouchHeight);
+                // move the player head down to crouched height
                 if (playerVelocity.magnitude > basePlayerSpeed) // is the player crouches while moving faster than the players default walking speed it initiaites a slide
                 {
                     isSliding = true;
@@ -411,9 +433,9 @@ namespace AtrillionGamesLtd
             else
             {
                 setHeadPosition(playerStandingHeight);
-
                 // Find inventory reference
-                playerInventory = FindObjectOfType<PlayerInventory>(); // move the player head back up to standing height
+                playerInventory = FindObjectOfType<PlayerInventory>();
+                // move the player head back up to standing height
                 isSliding = false;
             }
         }
@@ -423,6 +445,7 @@ namespace AtrillionGamesLtd
             // Only sprint if grounded, not crouching, and stamina is sufficient
             if (isSprinting && isGrounded && !isCrouching && currentStamina >= sprintStaminaCostPerSecond * Time.deltaTime)
             {
+
                 playerMovementSpeed *= sprintSpeedMultiplier;
 
                 // Drain stamina for sprinting
@@ -440,14 +463,17 @@ namespace AtrillionGamesLtd
             // If the player is grounded, apply movement grounded movement
             if (isGrounded)
             {
-                if (isSliding) // If player is grounded but is not in full control (i.e. sliding) then their movement is scaled down by the player slide control
+                if (isSliding) // If player is grounded but is not 
+                // in full control (i.e. sliding) then their movement is scaled down by the player slide control
                 {
                     playerVelocity += move * playerSlideControl * Time.fixedDeltaTime;
                 }
                 else // If player is actually in full control then their movement is the player input
                 {
-                    playerVelocity += (move * playerMovementSpeed);
-                    playerVelocity /= 2f;
+                    // FIX: Replaced division with Lerp for smooth acceleration and consistent speed
+                    Vector3 targetVelocity = move * playerMovementSpeed;
+                    playerVelocity = Vector3.Lerp(playerVelocity, targetVelocity, 0.2f);
+
                     Debug.DrawRay(transform.position, move, Color.cyan, 5f);
                 }
             }
@@ -455,13 +481,14 @@ namespace AtrillionGamesLtd
             {
                 // Check if enough stamina to continue wall running
                 if (currentStamina >= wallRunStaminaCostPerSecond * Time.fixedDeltaTime)
+
                 {
                     // Drain stamina for wall running
                     DrainStamina(wallRunStaminaCostPerSecond * Time.fixedDeltaTime);
-
                     float wallRunControl = playerWallRunControl * Mathf.Clamp01(1 - pointInWallRun * playerWallRunFallOff) * Mathf.Clamp01(Vector3.Dot(playerVelocity.normalized, move));
                     playerVelocity += move * playerMovementSpeed * wallRunControl * Time.fixedDeltaTime;
-                    playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime; // Add gravity
+                    playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime;
+                    // Add gravity
                 }
                 else
                 {
@@ -473,13 +500,15 @@ namespace AtrillionGamesLtd
             { // If the player isn't touching the ground then their movement is dictated by the air control amount
                 if (isGrappling && !isWallRunning && !isGrounded && !isClambering && TryClamber(out Vector3 ledgePoint))
                 {
+
                     StartCoroutine(ClamberToLedge(ledgePoint));
                     return;
                 }
 
                 playerVelocity += move * playerMovementSpeed * playerAirControl * Time.fixedDeltaTime;
                 playerVelocity += gravityDirection * gravityValue * Time.fixedDeltaTime; // Add gravity
-                playerVelocity *= 1f - playerAirResistance; // Add Air Resistance
+                playerVelocity *= 1f - playerAirResistance;
+                // Add Air Resistance
 
                 if (playerVelocity.magnitude > localAirSpeedCap && localAirSpeedCap > 0f) // caps the player to a maximum air velocity
                 {
@@ -490,56 +519,83 @@ namespace AtrillionGamesLtd
                         Mathf.Abs(newVelocity.x) > Mathf.Abs(oldGravitySpeed.x) ? newVelocity.x : oldGravitySpeed.x,
                         Mathf.Abs(newVelocity.y) > Mathf.Abs(oldGravitySpeed.y) ? newVelocity.y : oldGravitySpeed.y,
                         Mathf.Abs(newVelocity.z) > Mathf.Abs(oldGravitySpeed.z) ? newVelocity.z : oldGravitySpeed.z
+
                     );
                 }
             }
         }
 
-        void handleJumping()
+        [SerializeField] private float initialJumpVelocity = 7f;
+        // height when just tapped
+        [SerializeField] private float holdForce = 20f;
+        // continuous upward force while held
+        [SerializeField] private float maxHoldTime = 0.25f;
+        // how long you can hold to boost
+        [SerializeField] private float earlyReleaseGravity = 25f;
+        // stronger gravity for tap jumps
+
+
+        private float holdTimer = 0f;
+        private bool jumpActive = false;
+
+
+        void handleJumping(bool jumpInputDown, bool jumpInputHeld) // jumpInputDown is now the buffered state
         {
+            // --- Decrement timer happens in playerMove() now, we just check and consume here ---
+
+            // --- 1. Grounded Reset and Setup ---
+            if (isGrounded)
             {
-                if (!canPerformActions || isJumpDisabled || isCrouching)
-                    return;
+                jumpActive = false;
+                holdTimer = 0f;
+                jumpBufferTimer = 0f; // Clear buffer on landing
+            }
 
-                if (isJumping)
+            if (!canPerformActions || isCrouching)
+                return;
+
+            // --- 2. Start Jump (Initial Velocity) ---
+            if (jumpInputDown && isGrounded && !jumpActive)
+            {
+                // Consume the jump input by setting the timer to 0
+                jumpBufferTimer = 0f;
+
+                DrainStamina(jumpStaminaCost);
+
+                // Apply base jump instantly
+                playerVelocity = new Vector3(playerVelocity.x, initialJumpVelocity, playerVelocity.z);
+
+                isGrounded = false;
+                jumpActive = true;
+                holdTimer = 0f;
+            }
+
+            // --- 3. Hold Boost (Add Force) ---
+            if (jumpActive && jumpInputHeld && !isGrounded)
+            {
+                if (holdTimer < maxHoldTime)
                 {
-                    // Ground Jump
-                    if (isGrounded)
-                    {
-                        DrainStamina(jumpStaminaCost);
-                        playerVelocity += (slopeNormal + transform.up).normalized * jumpHeight;
-                        isJumpDisabled = true;
-                        isGrounded = false;
-                    }
-                    // Wall Jump (only if not grounded)
-                    else if (isWallRunning && !isGrounded)
-                    {
-                        DrainStamina(jumpStaminaCost);
-                        playerVelocity += (slopeNormal + transform.up).normalized * playerWallRunJumpPower;
-                        isJumpDisabled = true;
-                    }
-
-                    isJumping = false; // Reset this flag here to avoid one-time lockout
+                    playerVelocity += Vector3.up * holdForce * Time.fixedDeltaTime;
+                    holdTimer += Time.fixedDeltaTime;
                 }
             }
 
-            // Re-enable jump if jump key is released
-            if (!isJumping)
+            // --- 4. Early Release Gravity Cut-off ---
+            if (jumpActive && !jumpInputHeld && playerVelocity.y > 0)
             {
-                isJumpDisabled = false;
+                playerVelocity += gravityDirection.normalized * earlyReleaseGravity * Time.fixedDeltaTime;
             }
         }
-
         void handleSliding(Vector3 slideDirection, float groundFriction)
         {
             if (isSliding)
             {
                 // Optional: drain only once at slide start — you’d put this in the slide activation logic instead
+
                 if (currentStamina >= slideStaminaCost)
                 {
                     // Drain stamina only once — recommended to move this where sliding starts
                     DrainStamina(slideStaminaCost);
-
                     playerVelocity += slideDirection * gravityValue * Time.fixedDeltaTime;
                     playerVelocity -= playerVelocity * groundFriction * Time.fixedDeltaTime;
                 }
@@ -566,16 +622,14 @@ namespace AtrillionGamesLtd
             //Debug.DrawRay(playerCameraHolder.position, ((transform.position + headOffset) - playerCameraHolder.position), Color.red, 5f);
             prevPlayerPos = transform.position;
             // ---------------- Determine what is being stood on --------------------
-            RotateTransformToDirection(transform, gravityDirection, rotateTowardsGravityRate * Time.fixedDeltaTime); // rotate the character's down transform to point in the direction of gravity
+            RotateTransformToDirection(transform, gravityDirection, rotateTowardsGravityRate * Time.fixedDeltaTime);
+            // rotate the character's down transform to point in the direction of gravity
 
             whatIsPlayerStoodOn(ref slopeDirection, ref slideDirection, ref groundFriction);
-
-
             // ----------------------------------------------------------------------   
 
             // ------------------ Player movement input handling --------------------
             Vector3 move = getPlayerMoveDirection(slopeDirection);
-
             // ------- Apply movement speed modifiers (sprint, crouch, sliding etc.) --------
 
             // Calculate movement speed based on inventory weight
@@ -586,14 +640,17 @@ namespace AtrillionGamesLtd
             }
 
             float playerMovementSpeed = Mathf.Max(1f, basePlayerSpeed - penalty);
-
             handleCrouching(ref playerMovementSpeed);
 
             handleSprinting(ref playerMovementSpeed);
 
             handleMovement(playerMovementSpeed, move);
 
-            handleJumping();
+            // ** FIX: Calculate buffered jump state and decrement timer BEFORE calling handleJumping **
+            bool jumpBufferedInputDown = jumpBufferTimer > 0f;
+            jumpBufferTimer -= Time.fixedDeltaTime;
+
+            handleJumping(jumpBufferedInputDown, jumpInputHeld);
 
             handleSliding(slideDirection, groundFriction);
 
@@ -606,6 +663,7 @@ namespace AtrillionGamesLtd
             handleStairs();
             //Debug.DrawRay(transform.position, playerVelocity, Color.green, 20f);
 
+
             //isGrounded = false;
             isWallRunning = false;
             slopeDirection = Vector3.zero;
@@ -614,18 +672,19 @@ namespace AtrillionGamesLtd
             groundFriction = 0f;
         }
 
-        // This event is triggered when the sphere first collides with another object
+        // This event is triggered when the sphere first collides with 
         private void OnCollisionStay(Collision collision)
         {
             foreach (ContactPoint contact in collision.contacts)
             {
                 float angle = Vector3.Angle(contact.normal, -gravityDirection);
-
-                isWallRunning = ((angle > maxWalkableSlope && angle < 120f) || isWallRunning) && !isGrounded; // Less than 120 to prevent the player from wallrunning on ceilings or overhangs
+                isWallRunning = ((angle > maxWalkableSlope && angle < 120f) || isWallRunning) && !isGrounded;
+                // Less than 120 to prevent the player from wallrunning on ceilings or overhangs
 
                 if (isWallRunning && !isGrounded)
                 { // If this specific contact point is a wallRunning point
-                    slopeNormal = contact.normal; // This will get overwritten if one of the later contact points shows it is grounded
+                    slopeNormal = contact.normal;
+                    // This will get overwritten if one of the later contact points shows it is grounded
                 }
             }
 
@@ -658,8 +717,17 @@ namespace AtrillionGamesLtd
         {
             playerLookAround();
             //playerInputs(); // uncomment this to use the old input system and
-            GetPlayerInputs(); // comment this out
+            GetPlayerInputs();
+            // comment this out
             HandleStamina();
+
+            // ** FIX: Input Buffer implementation **
+            if (Input.GetButtonDown("Jump"))
+            {
+                jumpBufferTimer = jumpBufferTime; // Start the buffer timer
+            }
+            jumpInputHeld = Input.GetButton("Jump");
+            // ** END Input Buffer **
         }
 
         void FixedUpdate()
@@ -691,7 +759,6 @@ namespace AtrillionGamesLtd
 
             // Check if stamina is depleted
             canPerformActions = currentStamina > 0;
-
             staminaUI.UpdateStaminaBar(currentStamina, maxStamina);
         }
         private void DrainStamina(float amount)
@@ -710,23 +777,19 @@ namespace AtrillionGamesLtd
         [SerializeField] private LayerMask clamberCheckLayers = ~0;
 
         private bool isClambering = false;
-
         bool TryClamber(out Vector3 ledgePoint)
         {
             ledgePoint = Vector3.zero;
-
             Vector3 upDirection = -gravityDirection.normalized;
             Vector3 forward = transform.forward;
 
             // Check from chest height slightly in front of player
             Vector3 wallCheckOrigin = transform.position + upDirection * 1.0f + forward * 0.4f;
-
             float wallCheckDistance = 1.0f;
             if (Physics.Raycast(wallCheckOrigin, forward, out RaycastHit wallHit, wallCheckDistance, clamberCheckLayers))
             {
                 // Check for ledge above the wall hit point
                 Vector3 ledgeCheckOrigin = wallHit.point + upDirection * 1.2f - forward * 0.1f;
-
                 float ledgeRadius = 0.3f;
                 float ledgeHeight = 1.2f;
 
@@ -734,6 +797,7 @@ namespace AtrillionGamesLtd
                 {
                     if (Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
                     {
+
                         ledgePoint = ledgeHit.point;
                         return true;
                     }
@@ -756,20 +820,17 @@ namespace AtrillionGamesLtd
         private bool CanClamberAtPoint(Vector3 grapplePoint, out Vector3 ledgePoint)
         {
             ledgePoint = Vector3.zero;
-
             Vector3 upDirection = -gravityDirection.normalized;
             Vector3 forwardDirection = transform.forward;
 
             // Slight inward offset to avoid scanning behind wall
             Vector3 ledgeCheckOrigin = grapplePoint + upDirection * 1.2f - forwardDirection * 0.3f;
-
             float checkDistance = 1.5f;
             float sphereRadius = 0.3f;
 
             if (Physics.SphereCast(ledgeCheckOrigin, sphereRadius, -upDirection, out RaycastHit ledgeHit, checkDistance, clamberCheckLayers))
             {
                 float verticalDelta = Vector3.Dot(ledgeHit.point - grapplePoint, upDirection);
-
                 // Only clamber if the ledge is *above* the grapple point by a small amount
                 if (verticalDelta > 0.5f && verticalDelta <= 1.5f && Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
                 {
@@ -813,7 +874,6 @@ namespace AtrillionGamesLtd
         private void OnDrawGizmosSelected()
         {
             if (!Application.isPlaying) return;
-
             Vector3 upDirection = -gravityDirection.normalized;
             Vector3 forward = transform.forward;
             Vector3 wallCheckOrigin = transform.position + upDirection * 1.0f + forward * 0.4f;
@@ -821,7 +881,6 @@ namespace AtrillionGamesLtd
 
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(wallCheckOrigin, wallCheckOrigin + forward * wallCheckDistance);
-
             Vector3 ledgeCheckOrigin = wallCheckOrigin + forward * wallCheckDistance + upDirection * 1.2f - forward * 0.1f;
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(ledgeCheckOrigin, 0.3f);
