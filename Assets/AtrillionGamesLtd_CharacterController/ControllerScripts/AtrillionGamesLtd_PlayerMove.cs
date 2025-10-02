@@ -100,16 +100,18 @@ namespace AtrillionGamesLtd
 
         // ** Custom Player Input States **
         // Renamed 'jumpInputDown' for clarity in buffer logic
-        private bool jumpInputHeld = false; // True for every frame the jump button is held
+        private bool jumpInputHeld = false;
+        // True for every frame the jump button is held
 
         [Space]
         [Header("Grounding & Jump Fixes")]
         [SerializeField] private float groundCheckPadding = 0.05f;
         // Small buffer to ensure raycast hits when player is still or resting on geometry.
-
         // ** JUMP INPUT BUFFER FIELDS **
-        [SerializeField] private float jumpBufferTime = 0.15f; // Time in seconds to hold the input
-        private float jumpBufferTimer = 0f; // The timer itself
+        [SerializeField] private float jumpBufferTime = 0.15f;
+        // Time in seconds to hold the input
+        private float jumpBufferTimer = 0f;
+        // The timer itself
         // ** END JUMP INPUT BUFFER FIELDS **
 
         void Awake()
@@ -236,11 +238,11 @@ namespace AtrillionGamesLtd
             playerBodyCollider.height = playerCrouchHeight;
             playerBodyCollider.radius = playerRadius;
 
-            if (playerStandingHeight-playerCrouchHeight < stepHeight)
+            if (playerStandingHeight - playerCrouchHeight < stepHeight)
             {
                 Debug.LogWarning("Step height exceeds player leg length. (playerStandingHeight - playerCrouchHeight) is the leg length");
             }
-            stepHeight = Mathf.Min(stepHeight, playerStandingHeight-playerCrouchHeight);
+            stepHeight = Mathf.Min(stepHeight, playerStandingHeight - playerCrouchHeight);
 
             setHeadPosition(playerStandingHeight);
             // Find inventory reference
@@ -254,7 +256,7 @@ namespace AtrillionGamesLtd
             if (angleToTarget > 0f)
             {
                 // Calculates the direction to rotate towards to ensure the player is alinged with gravity
-                Vector3 stepTargetDirection = Vector3.Slerp(-_transform.up, targetDirection, Mathf.Clamp01((rotationSpeed*10f)/(angleToTarget)));
+                Vector3 stepTargetDirection = Vector3.Slerp(-_transform.up, targetDirection, Mathf.Clamp01((rotationSpeed * 10f) / (angleToTarget)));
                 // Calculate the rotation that aligns the transform that points down with stepTargetDirection
                 Quaternion targetRotation = Quaternion.FromToRotation(-_transform.up, stepTargetDirection);
                 // uncomment for debugging gravity alignment issues, It shows 2 rays.
@@ -297,6 +299,7 @@ namespace AtrillionGamesLtd
                 if (lastSurface != Surface)
                 {
 
+
                     transform.SetParent(null);
                     wherePlayerLastStood.transform.position = Surface.position;
                     wherePlayerLastStood.transform.rotation = Surface.rotation;
@@ -315,6 +318,7 @@ namespace AtrillionGamesLtd
             {
                 if (lastSurface)
                 { // Ground to Air transition
+
 
                     localAirSpeedCap = Mathf.Min(absolutePlayerVelocity.magnitude, airtimeSpeedCap);
                     playerVelocity += absolutePlayerVelocity;
@@ -338,15 +342,13 @@ namespace AtrillionGamesLtd
             isGrounded = false;
             RaycastHit directlyGrounded;
             Debug.DrawRay(transform.position, gravityDirection * playerStandingHeight, Color.cyan, 5f);
-
             // FIX: Use groundCheckPadding to prevent sticky/inconsistent jump
-            float rayDistance = (headOffset/2) + stepHeight + groundCheckPadding;
-
+            float rayDistance = (headOffset / 2) + stepHeight + groundCheckPadding;
             if (Physics.Raycast(transform.position, gravityDirection, out directlyGrounded, rayDistance, floorlayers))
             {
                 isGrounded = true;
                 standingOnMovingSurface(directlyGrounded.collider.transform, directlyGrounded.point);
-                headDistance = ((headOffset/2)+stepHeight) - directlyGrounded.distance;
+                headDistance = ((headOffset / 2) + stepHeight) - directlyGrounded.distance;
 
                 float angle = Vector3.Angle(directlyGrounded.normal, -gravityDirection);
 
@@ -446,6 +448,7 @@ namespace AtrillionGamesLtd
             if (isSprinting && isGrounded && !isCrouching && currentStamina >= sprintStaminaCostPerSecond * Time.deltaTime)
             {
 
+
                 playerMovementSpeed *= sprintSpeedMultiplier;
 
                 // Drain stamina for sprinting
@@ -464,14 +467,15 @@ namespace AtrillionGamesLtd
             if (isGrounded)
             {
                 if (isSliding) // If player is grounded but is not 
-                // in full control (i.e. sliding) then their movement is scaled down by the player slide control
+                               // in full control (i.e. sliding) then their movement is scaled down by the player slide control
                 {
                     playerVelocity += move * playerSlideControl * Time.fixedDeltaTime;
                 }
                 else // If player is actually in full control then their movement is the player input
                 {
                     // FIX: Replaced division with Lerp for smooth acceleration and consistent speed
-                    Vector3 targetVelocity = move * playerMovementSpeed;
+                    Vector3 targetVelocity
+                    = move * playerMovementSpeed;
                     playerVelocity = Vector3.Lerp(playerVelocity, targetVelocity, 0.2f);
 
                     Debug.DrawRay(transform.position, move, Color.cyan, 5f);
@@ -483,6 +487,7 @@ namespace AtrillionGamesLtd
                 if (currentStamina >= wallRunStaminaCostPerSecond * Time.fixedDeltaTime)
 
                 {
+
                     // Drain stamina for wall running
                     DrainStamina(wallRunStaminaCostPerSecond * Time.fixedDeltaTime);
                     float wallRunControl = playerWallRunControl * Mathf.Clamp01(1 - pointInWallRun * playerWallRunFallOff) * Mathf.Clamp01(Vector3.Dot(playerVelocity.normalized, move));
@@ -500,6 +505,7 @@ namespace AtrillionGamesLtd
             { // If the player isn't touching the ground then their movement is dictated by the air control amount
                 if (isGrappling && !isWallRunning && !isGrounded && !isClambering && TryClamber(out Vector3 ledgePoint))
                 {
+
 
                     StartCoroutine(ClamberToLedge(ledgePoint));
                     return;
@@ -520,7 +526,8 @@ namespace AtrillionGamesLtd
                         Mathf.Abs(newVelocity.y) > Mathf.Abs(oldGravitySpeed.y) ? newVelocity.y : oldGravitySpeed.y,
                         Mathf.Abs(newVelocity.z) > Mathf.Abs(oldGravitySpeed.z) ? newVelocity.z : oldGravitySpeed.z
 
-                    );
+
+                     );
                 }
             }
         }
@@ -538,10 +545,27 @@ namespace AtrillionGamesLtd
         private float holdTimer = 0f;
         private bool jumpActive = false;
 
-
+        // ATG: MODIFIED - Added Wall Jump Logic
         void handleJumping(bool jumpInputDown, bool jumpInputHeld) // jumpInputDown is now the buffered state
         {
-            // --- Decrement timer happens in playerMove() now, we just check and consume here ---
+            // --- Wall Jump Logic ---
+            if (jumpInputDown && isWallRunning && !isGrounded)
+            {
+                jumpBufferTimer = 0f; // Consume the jump buffer
+                DrainStamina(jumpStaminaCost); // Use standard jump stamina cost
+
+                // Calculate the jump direction: a combination of upward force and force pushing away from the wall.
+                Vector3 wallJumpDirection = (slopeNormal - gravityDirection.normalized);
+
+                // Apply a new velocity for the wall jump, providing a controlled and responsive feel.
+                // We add the wall normal again to give a stronger push away from the wall itself.
+                playerVelocity = (wallJumpDirection + slopeNormal) * playerWallRunJumpPower;
+
+                isWallRunning = false; // Player is no longer on the wall
+                jumpActive = false; // Prevent hold-jump logic from interfering
+                holdTimer = 0f;
+                return; // Exit early to prevent other jump logic from running this frame
+            }
 
             // --- 1. Grounded Reset and Setup ---
             if (isGrounded)
@@ -559,12 +583,10 @@ namespace AtrillionGamesLtd
             {
                 // Consume the jump input by setting the timer to 0
                 jumpBufferTimer = 0f;
-
                 DrainStamina(jumpStaminaCost);
 
                 // Apply base jump instantly
                 playerVelocity = new Vector3(playerVelocity.x, initialJumpVelocity, playerVelocity.z);
-
                 isGrounded = false;
                 jumpActive = true;
                 holdTimer = 0f;
@@ -618,7 +640,7 @@ namespace AtrillionGamesLtd
         void playerMove()
         {
             playerVelocity = playerBodyRigidBody.velocity;
-            absolutePlayerVelocity = (transform.position - prevPlayerPos)/Time.fixedDeltaTime;
+            absolutePlayerVelocity = (transform.position - prevPlayerPos) / Time.fixedDeltaTime;
             //Debug.DrawRay(playerCameraHolder.position, ((transform.position + headOffset) - playerCameraHolder.position), Color.red, 5f);
             prevPlayerPos = transform.position;
             // ---------------- Determine what is being stood on --------------------
@@ -657,7 +679,6 @@ namespace AtrillionGamesLtd
             // ----------------------------------------------------------------------
 
             //Debug.DrawRay(transform.position, gravityDirection, Color.cyan, 20f);
-
             playerBodyRigidBody.velocity = (playerVelocity);
 
             handleStairs();
@@ -665,7 +686,8 @@ namespace AtrillionGamesLtd
 
 
             //isGrounded = false;
-            isWallRunning = false;
+            // ATG: MODIFIED - Removed isWallRunning = false; to improve state management.
+            // The state is now managed correctly by OnCollisionStay and OnCollisionExit.
             slopeDirection = Vector3.zero;
             slideDirection = Vector3.zero;
             slopeNormal = Vector3.zero;
@@ -673,21 +695,29 @@ namespace AtrillionGamesLtd
         }
 
         // This event is triggered when the sphere first collides with 
+        // ATG: MODIFIED - Added logic to fix the "massive jump" bug
         private void OnCollisionStay(Collision collision)
         {
             foreach (ContactPoint contact in collision.contacts)
             {
                 float angle = Vector3.Angle(contact.normal, -gravityDirection);
-                isWallRunning = ((angle > maxWalkableSlope && angle < 120f) || isWallRunning) && !isGrounded;
+
+                // Calculate vertical velocity to prevent wall-run activation on initial jump ascent.
+                float verticalVelocity = Vector3.Dot(playerBodyRigidBody.velocity, -gravityDirection.normalized);
+
+                // A player can only initiate a wall run if they are not grounded and not rapidly ascending.
+                // This prevents a normal jump next to a wall from turning into a massive leap.
+                bool canInitiateWallRun = !isGrounded && verticalVelocity < 2f;
+
+                // Check if we should be wall running. Maintain the state if already running and not grounded.
+                isWallRunning = (angle > maxWalkableSlope && angle < 120f && canInitiateWallRun) || (isWallRunning && !isGrounded);
                 // Less than 120 to prevent the player from wallrunning on ceilings or overhangs
 
                 if (isWallRunning && !isGrounded)
                 { // If this specific contact point is a wallRunning point
                     slopeNormal = contact.normal;
-                    // This will get overwritten if one of the later contact points shows it is grounded
                 }
             }
-
         }
 
         void OnCollisionExit(Collision collisionInfo)
@@ -720,11 +750,11 @@ namespace AtrillionGamesLtd
             GetPlayerInputs();
             // comment this out
             HandleStamina();
-
             // ** FIX: Input Buffer implementation **
             if (Input.GetButtonDown("Jump"))
             {
-                jumpBufferTimer = jumpBufferTime; // Start the buffer timer
+                jumpBufferTimer = jumpBufferTime;
+                // Start the buffer timer
             }
             jumpInputHeld = Input.GetButton("Jump");
             // ** END Input Buffer **
@@ -797,6 +827,7 @@ namespace AtrillionGamesLtd
                 {
                     if (Vector3.Angle(ledgeHit.normal, upDirection) <= maxWalkableSlope)
                     {
+
 
                         ledgePoint = ledgeHit.point;
                         return true;
