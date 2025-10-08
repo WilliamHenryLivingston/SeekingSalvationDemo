@@ -1,7 +1,9 @@
-//Copyright 2025 William Livingston
+// Copyright 2025 William Livingston
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+
 
 [CreateAssetMenu(fileName = "NewInventoryItem", menuName = "Inventory/Item")]
 public class InventoryItem : ScriptableObject
