@@ -15,7 +15,7 @@ public class SpearShooter : MonoBehaviour
         Rigidbody rb = spear.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            rb.velocity = firePoint.forward * spearSpeed;
+            rb.linearVelocity = firePoint.forward * spearSpeed;
         }
     }
 }

@@ -94,7 +94,7 @@ public class GrapplingHook : MonoBehaviour
         grapplePoint = point;
         isZipping = true;
         playerRb.useGravity = false;
-        playerRb.velocity = Vector3.zero;
+        playerRb.linearVelocity = Vector3.zero;
 
         if (playerMoveScript != null)
             playerMoveScript.isGrappling = true;
@@ -108,7 +108,7 @@ public class GrapplingHook : MonoBehaviour
         if (distance < 1f)
         {
             isZipping = false;
-            playerRb.velocity = Vector3.zero;
+            playerRb.linearVelocity = Vector3.zero;
 
             if (playerMoveScript != null)
             {
@@ -117,7 +117,7 @@ public class GrapplingHook : MonoBehaviour
                 if (!clambered)
                 {
                     playerRb.useGravity = false;
-                    playerRb.velocity = Vector3.zero;
+                    playerRb.linearVelocity = Vector3.zero;
                     transform.position = grapplePoint;
                 }
             }
@@ -142,7 +142,7 @@ public class GrapplingHook : MonoBehaviour
         isZipping = false;
         isAiming = false;
         playerRb.useGravity = true;
-        playerRb.velocity = Vector3.zero;
+        playerRb.linearVelocity = Vector3.zero;
 
         if (grappleReticle != null)
             grappleReticle.SetActive(false);

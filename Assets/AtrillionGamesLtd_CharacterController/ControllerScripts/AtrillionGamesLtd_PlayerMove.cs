@@ -173,12 +173,12 @@ namespace AtrillionGamesLtd
 
             // Create a new PhysicMaterial and set properties so that the player movement is consistent and accurate
             // The physics are calculated internally so we don't want friction to be applied externally by the unity physics system
-            PhysicMaterial physMaterial = new PhysicMaterial();
+            PhysicsMaterial physMaterial = new PhysicsMaterial();
             physMaterial.dynamicFriction = 0f;
             physMaterial.staticFriction = 0f;
             physMaterial.bounciness = 0f;
-            physMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
-            physMaterial.bounceCombine = PhysicMaterialCombine.Minimum;
+            physMaterial.frictionCombine = PhysicsMaterialCombine.Minimum;
+            physMaterial.bounceCombine = PhysicsMaterialCombine.Minimum;
             // Assign the material to the collider
             playerBodyCollider.material = physMaterial;
             // Make sure the player body and player head don't roll or use gravity since that will also be calculated internally
@@ -362,7 +362,7 @@ namespace AtrillionGamesLtd
                     Collider hitCollider = directlyGrounded.collider;
                     if (hitCollider != null && hitCollider.material != null)
                     {
-                        PhysicMaterial hitMaterial = hitCollider.material;
+                        PhysicsMaterial hitMaterial = hitCollider.material;
                         groundFriction = hitMaterial.dynamicFriction;
                     }
                 }
@@ -456,7 +456,7 @@ namespace AtrillionGamesLtd
             }
             else
             {
-                // Not enough stamina — prevent sprinting
+                // Not enough stamina ï¿½ prevent sprinting
                 isSprinting = false;
             }
         }
@@ -497,7 +497,7 @@ namespace AtrillionGamesLtd
                 }
                 else
                 {
-                    // Not enough stamina — exit wall run
+                    // Not enough stamina ï¿½ exit wall run
                     isWallRunning = false;
                 }
             }
@@ -612,18 +612,18 @@ namespace AtrillionGamesLtd
         {
             if (isSliding)
             {
-                // Optional: drain only once at slide start — you’d put this in the slide activation logic instead
+                // Optional: drain only once at slide start ï¿½ youï¿½d put this in the slide activation logic instead
 
                 if (currentStamina >= slideStaminaCost)
                 {
-                    // Drain stamina only once — recommended to move this where sliding starts
+                    // Drain stamina only once ï¿½ recommended to move this where sliding starts
                     DrainStamina(slideStaminaCost);
                     playerVelocity += slideDirection * gravityValue * Time.fixedDeltaTime;
                     playerVelocity -= playerVelocity * groundFriction * Time.fixedDeltaTime;
                 }
                 else
                 {
-                    // Not enough stamina — cancel slide
+                    // Not enough stamina ï¿½ cancel slide
                     isSliding = false;
                 }
             }
@@ -639,7 +639,7 @@ namespace AtrillionGamesLtd
 
         void playerMove()
         {
-            playerVelocity = playerBodyRigidBody.velocity;
+            playerVelocity = playerBodyRigidBody.linearVelocity;
             absolutePlayerVelocity = (transform.position - prevPlayerPos) / Time.fixedDeltaTime;
             //Debug.DrawRay(playerCameraHolder.position, ((transform.position + headOffset) - playerCameraHolder.position), Color.red, 5f);
             prevPlayerPos = transform.position;
@@ -679,7 +679,7 @@ namespace AtrillionGamesLtd
             // ----------------------------------------------------------------------
 
             //Debug.DrawRay(transform.position, gravityDirection, Color.cyan, 20f);
-            playerBodyRigidBody.velocity = (playerVelocity);
+            playerBodyRigidBody.linearVelocity = (playerVelocity);
 
             handleStairs();
             //Debug.DrawRay(transform.position, playerVelocity, Color.green, 20f);
@@ -703,7 +703,7 @@ namespace AtrillionGamesLtd
                 float angle = Vector3.Angle(contact.normal, -gravityDirection);
 
                 // Calculate vertical velocity to prevent wall-run activation on initial jump ascent.
-                float verticalVelocity = Vector3.Dot(playerBodyRigidBody.velocity, -gravityDirection.normalized);
+                float verticalVelocity = Vector3.Dot(playerBodyRigidBody.linearVelocity, -gravityDirection.normalized);
 
                 // A player can only initiate a wall run if they are not grounded and not rapidly ascending.
                 // This prevents a normal jump next to a wall from turning into a massive leap.
@@ -879,7 +879,7 @@ namespace AtrillionGamesLtd
         {
             isClambering = true;
             canPerformActions = false;
-            playerBodyRigidBody.velocity = Vector3.zero;
+            playerBodyRigidBody.linearVelocity = Vector3.zero;
 
             Vector3 upDirection = -gravityDirection.normalized;
             Vector3 startPos = transform.position;
