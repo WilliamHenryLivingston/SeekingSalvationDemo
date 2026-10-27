@@ -1,0 +1,52 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="JoinSessionByQuickJoin" src="project://database/Assets/Blocks/MultiplayerSession/UI/JoinSessionByQuickJoin.uxml?fileID=9197481963319205126&amp;guid=8d90af11efb27e942a4c9cc34f5d6162&amp;type=3#JoinSessionByQuickJoin"/>
+    <ui:VisualElement data-source="project://database/Assets/Blocks/MultiplayerSession/Settings/SessionSettings.asset?fileID=11400000&amp;guid=0bf4e1684added44da254017c7fc41b2&amp;type=2#SessionSettings" class="blocks-menu">
+        <ui:Instance template="JoinSessionByQuickJoin" class="blocks-container--stretch blocks-element--space-bottom"/>
+        <engine:VisualElement xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" template="CurrentSession">
+            <engine:VisualElement class="blocks-modal">
+                <engine:VisualElement class="blocks-container--horizontal blocks-container--space-between blocks-modal--left-aligned-text">
+                    <Blocks.Sessions.Common.SessionNameLabel class="blocks-header blocks-element--space-right">
+                        <Bindings>
+                            <engine:DataBinding property="SessionType" data-source-path="sessionType" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </Blocks.Sessions.Common.SessionNameLabel>
+                    <Blocks.Sessions.Common.PlayerCountLabel>
+                        <Bindings>
+                            <engine:DataBinding property="SessionType" binding-mode="ToTarget" data-source-path="sessionType"/>
+                        </Bindings>
+                    </Blocks.Sessions.Common.PlayerCountLabel>
+                </engine:VisualElement>
+                <engine:VisualElement class="blocks-container--horizontal blocks-container--space-between blocks-element--space-bottom blocks-modal--left-aligned-text">
+                    <Blocks.Sessions.Common.PlayerNameLabel class="blocks-element--space-right blocks-header blocks-header--sm">
+                        <Bindings>
+                            <engine:DataBinding property="SessionType" data-source-path="sessionType" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </Blocks.Sessions.Common.PlayerNameLabel>
+                    <Blocks.Sessions.Common.CopySessionCodeElement class="blocks-copy-session--header">
+                        <Bindings>
+                            <engine:DataBinding property="SessionType" data-source-path="sessionType" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </Blocks.Sessions.Common.CopySessionCodeElement>
+                </engine:VisualElement>
+                <Blocks.Sessions.Common.PlayerListViewElement class="blocks-element--space-bottom">
+                    <Bindings>
+                        <engine:DataBinding property="SessionType" data-source-path="sessionType" binding-mode="ToTarget"/>
+                    </Bindings>
+                </Blocks.Sessions.Common.PlayerListViewElement>
+                <StartGameButton triple-click-selects-line="false" session-type="default-session"/>
+                <Blocks.Sessions.Common.LeaveSessionButton>
+                    <Bindings>
+                        <engine:DataBinding property="SessionType" binding-mode="ToTarget" data-source-path="sessionType"/>
+                    </Bindings>
+                </Blocks.Sessions.Common.LeaveSessionButton>
+                <engine:VisualElement class="blocks-container--horizontal blocks-container--right">
+                    <Blocks.Sessions.Common.SessionStatusLabel class="blocks-element--space-right blocks-label">
+                        <Bindings>
+                            <engine:DataBinding property="SessionType" data-source-path="sessionType" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </Blocks.Sessions.Common.SessionStatusLabel>
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -789,7 +789,8 @@ namespace AtrillionGamesLtd
 
             // Check if stamina is depleted
             canPerformActions = currentStamina > 0;
-            staminaUI.UpdateStaminaBar(currentStamina, maxStamina);
+            //staminaUI.UpdateStaminaBar(currentStamina, maxStamina);
+            // TODO: UNDO THIS @Kiran
         }
         private void DrainStamina(float amount)
         {

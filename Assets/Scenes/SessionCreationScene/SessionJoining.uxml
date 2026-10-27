@@ -33,7 +33,7 @@
                         <engine:DataBinding property="SessionType" data-source-path="sessionType" binding-mode="ToTarget"/>
                     </Bindings>
                 </Blocks.Sessions.Common.PlayerListViewElement>
-                <engine:Button text="Start Game" name="StartGameButton" style="opacity: 0.5;"/>
+                <StartGameButton/>
                 <Blocks.Sessions.Common.LeaveSessionButton>
                     <Bindings>
                         <engine:DataBinding property="SessionType" binding-mode="ToTarget" data-source-path="sessionType"/>
@@ -49,6 +49,4 @@
             </engine:VisualElement>
         </engine:VisualElement>
     </ui:VisualElement>
-    <Blocks.Sessions.SessionBrowserElement/>
-    <Blocks.Sessions.SessionBrowserElement/>
 </ui:UXML>

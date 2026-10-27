@@ -19,6 +19,9 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        // TODO: @Kiran Undo this and fix errors
+        return;
+
         // Find the player and its breadcrumb trail script
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)

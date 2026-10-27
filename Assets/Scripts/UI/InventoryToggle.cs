@@ -15,7 +15,8 @@ public class InventoryToggle : MonoBehaviour
 
     void Start()
     {
-        inventoryUI.SetActive(false);
+        // TODO: @Kiran Fix this
+        //inventoryUI.SetActive(false);
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }

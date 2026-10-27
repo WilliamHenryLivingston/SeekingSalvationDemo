@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SessionCreationScene.unity
     guid: 655c08e722df25045a37f948a6267351
+  - enabled: 1
+    path: Assets/Scenes/QuickJoinTestingScene.unity
+    guid: 05d2eacedc3be794cac37512c72a85cc
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
