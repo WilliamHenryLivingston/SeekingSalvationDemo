@@ -49,7 +49,7 @@ public class GameManager : NetworkBehaviour
         //Debug.Log("Start the game");
         IReadOnlyList<ulong> clients = NetworkManager.Singleton.ConnectedClientsIds;
 
-        //Debug.Log("Player count: " + clients.Count);
+        Debug.Log("Player count: " + clients.Count);
         if (_spawnPoints.Length <  clients.Count)
         {
             Debug.Log("There are more client's than there are spawn points. Add more spawn points to spawn new players");
@@ -63,12 +63,15 @@ public class GameManager : NetworkBehaviour
             player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clients[i]);
             player.GetComponent<Player>().SetUpPlayerId(clients[i]);
 
-            //Debug.Log("Player is created: " + clients[i], player);
+            Debug.Log("Player is created: " + clients[i], player);
         }
     }
 
     public void GameOver()
     {
+        return;
+        // TODO: @Kiran FIX THIS
+
         Time.timeScale = 0f;
 
         if (_inventoryToggle != null)
@@ -79,7 +82,7 @@ public class GameManager : NetworkBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        _gameOverUI.SetActive(true);
+        //_gameOverUI.SetActive(true);
     }
 
     public void RestartGame()

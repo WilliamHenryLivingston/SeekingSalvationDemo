@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 namespace AtrillionGamesLtd
 {
 
-    public class AtrillionGamesLtd_PlayerMove : MonoBehaviour
+    public class AtrillionGamesLtd_PlayerMove : NetworkBehaviour
     {
+        [SerializeField] private GameObject wherePlayerLastStoodPrefab;
         private GameObject wherePlayerLastStood;
         //Used for tracking moving parts and moving platforms
         private ATG_PlayerControls inputActions;
@@ -97,6 +99,7 @@ namespace AtrillionGamesLtd
 
         private CapsuleCollider playerBodyCollider;
         private Rigidbody playerBodyRigidBody;
+        private Player player;
 
         // ** Custom Player Input States **
         // Renamed 'jumpInputDown' for clarity in buffer logic
@@ -114,10 +117,32 @@ namespace AtrillionGamesLtd
         // The timer itself
         // ** END JUMP INPUT BUFFER FIELDS **
 
+        private bool networkStarted = false;
+
+        public override void OnNetworkSpawn()
+        {
+            if (!IsOwner)
+            {
+                PlayerInput input = GetComponent<PlayerInput>();
+                if (input != null)
+                {
+                    input.enabled = false;
+                }
+
+                this.enabled = false;
+            }
+
+            SetupMovement();
+            networkStarted = true;
+
+            base.OnNetworkSpawn();
+        }
+
         void Awake()
         {
-            currentStamina = maxStamina;
+            player = GetComponent<Player>();
             inputActions = new ATG_PlayerControls();
+            currentStamina = maxStamina;
         }
 
         void OnEnable()
@@ -226,11 +251,12 @@ namespace AtrillionGamesLtd
             // sets the initial player FOV
         }
 
-        private void Start()
+        private void SetupMovement()
         {
+            if (!IsOwner) { return; }
+
             AddScriptsIfMissing();
-            wherePlayerLastStood = new GameObject("wherePlayerLastStood"); // create the player holder (used for tracking moving platforms that the player might be standing on)
-            wherePlayerLastStood.transform.SetParent(null);
+            createWherePlayerLastStoodObjectRpc();
             // Set null as parent
 
             // FIX: Cursor ambiguity issue (CS0104) 
@@ -246,7 +272,31 @@ namespace AtrillionGamesLtd
 
             setHeadPosition(playerStandingHeight);
             // Find inventory reference
-            playerInventory = FindObjectOfType<PlayerInventory>();
+            playerInventory = FindFirstObjectByType<PlayerInventory>();
+        }
+
+        [Rpc(SendTo.Server)]
+        void createWherePlayerLastStoodObjectRpc()
+        {
+            //Debug.Log("Create where player last stood object", this);
+            wherePlayerLastStood = Instantiate(wherePlayerLastStoodPrefab, transform.position, transform.rotation); // create the player holder (used for tracking moving platforms that the player might be standing on)
+            wherePlayerLastStood.GetComponent<NetworkObject>().SpawnWithOwnership(player.ClientID);
+
+            NetworkObjectReference wherePlayerLastStandReference = new NetworkObjectReference(wherePlayerLastStood.GetComponent<NetworkObject>());
+
+            setWherePlayerLastStoodObjectRpc(wherePlayerLastStandReference);
+        }
+
+        [Rpc(SendTo.Owner)]
+        void setWherePlayerLastStoodObjectRpc(NetworkObjectReference wherePlayerLastStoodObject)
+        {
+            if (!wherePlayerLastStoodObject.TryGet(out NetworkObject lastStoodObject))
+            {
+                Debug.Log("Object is null", this);
+                return;
+            }
+
+            wherePlayerLastStood = lastStoodObject.gameObject;
         }
 
         void RotateTransformToDirection(Transform _transform, Vector3 targetDirection, float rotationSpeed = 10f)
@@ -282,7 +332,7 @@ namespace AtrillionGamesLtd
             yRotation = Mathf.Clamp(yRotation, -89.9f, 89.9f);
 
             // Apply the rotation
-            RotateTransformToDirection(playerCameraHolder, gravityDirection, rotateTowardsGravityRate * Time.deltaTime);
+            //RotateTransformToDirection(playerCamera, gravityDirection, rotateTowardsGravityRate * Time.deltaTime);
             // Calculate the horizontal (yaw) rotation in the perpendicular plane to gravity (mouseX input)
             float verticalRotation = mouseY * sensitivity;
             float horizontalRotation = mouseX * sensitivity;
@@ -436,7 +486,7 @@ namespace AtrillionGamesLtd
             {
                 setHeadPosition(playerStandingHeight);
                 // Find inventory reference
-                playerInventory = FindObjectOfType<PlayerInventory>();
+                playerInventory = FindFirstObjectByType<PlayerInventory>();
                 // move the player head back up to standing height
                 isSliding = false;
             }
@@ -698,6 +748,8 @@ namespace AtrillionGamesLtd
         // ATG: MODIFIED - Added logic to fix the "massive jump" bug
         private void OnCollisionStay(Collision collision)
         {
+            if (!IsOwner) { return; }
+
             foreach (ContactPoint contact in collision.contacts)
             {
                 float angle = Vector3.Angle(contact.normal, -gravityDirection);
@@ -722,6 +774,8 @@ namespace AtrillionGamesLtd
 
         void OnCollisionExit(Collision collisionInfo)
         {
+            if (!IsOwner) { return; }
+
             isWallRunning = false;
         }
 
@@ -745,6 +799,8 @@ namespace AtrillionGamesLtd
 
         void Update()
         {
+            if (!IsOwner || !networkStarted) { return; }
+
             playerLookAround();
             //playerInputs(); // uncomment this to use the old input system and
             GetPlayerInputs();
@@ -762,6 +818,8 @@ namespace AtrillionGamesLtd
 
         void FixedUpdate()
         {
+            if (!IsOwner) { return; }
+
             playerMove();
         }
 

@@ -21,6 +21,10 @@ public class ShrineTable : MonoBehaviour
 
     void Start()
     {
+
+        return;
+        // TODO: @Kiran FIX THIS STUFF
+
         playerCam = Camera.main;
         playerInventory = FindObjectOfType<PlayerInventory>();
 
