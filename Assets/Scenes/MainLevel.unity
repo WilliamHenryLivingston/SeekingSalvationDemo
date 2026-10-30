@@ -106005,6 +106005,7 @@ MonoBehaviour:
   - {fileID: 1711436032}
   _gameOverUI: {fileID: 0}
   _inventoryToggle: {fileID: 0}
+  _sessionCreationLevelName: QuickJoinTestingScene
 --- !u!114 &183004056
 MonoBehaviour:
   m_ObjectHideFlags: 0

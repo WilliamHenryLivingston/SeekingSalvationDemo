@@ -1,4 +1,5 @@
 //Copyright 2025 William Livingston
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -16,6 +17,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject _gameOverUI;
     public InventoryToggle _inventoryToggle;
 
+    [SerializeField] private string _sessionCreationLevelName;
+
 
     private void Awake()
     {
@@ -29,8 +32,23 @@ public class GameManager : NetworkBehaviour
         }
 
 
+        if (Application.isEditor)
+        {
+            CheckForNetwork();
+            return;
+        }
+
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    private void CheckForNetwork()
+    {
+        if (NetworkManager.Singleton == null)
+        {
+            SceneManager.LoadScene(_sessionCreationLevelName);
+        }
     }
 
     private void Start()
