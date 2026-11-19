@@ -237,9 +237,9 @@ namespace AtrillionGamesLtd
             }
 
             // Reset the transform of characterHolder
-            playerCameraHolder.localPosition = Vector3.zero;
-            playerCameraHolder.localRotation = Quaternion.identity;
-            playerCameraHolder.localScale = Vector3.one;
+            //playerCameraHolder.localPosition = Vector3.zero;
+            //playerCameraHolder.localRotation = Quaternion.identity;
+            //playerCameraHolder.localScale = Vector3.one;
 
             // Reset the transform of characterHolder
             playerCamera.localPosition = Vector3.zero;
