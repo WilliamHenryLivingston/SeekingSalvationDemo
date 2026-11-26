@@ -68,7 +68,10 @@ public class SteamSessionManager : MonoBehaviour
         SteamMatchmaking.OnLobbyInvite -= OnLobbyInvite;
         SteamMatchmaking.OnLobbyGameCreated -= OnLobbyGameCreated;
         SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequested;
-        
+
+
+        Disconnected();
+
         if (NetworkManager.Singleton != null)
         {
             NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
@@ -77,11 +80,6 @@ public class SteamSessionManager : MonoBehaviour
         }
 
         Steamworks.SteamClient.Shutdown();
-    }
-
-    private void OnApplicationQuit()
-    {
-        Disconnected();
     }
 
     private async void OnGameLobbyJoinRequested(Lobby lobby, SteamId id)
@@ -176,7 +174,19 @@ public class SteamSessionManager : MonoBehaviour
 
     public void Disconnected()
     {
+        if (!SteamClient.IsValid)
+        {
+            Debug.Log("Steam is already closed");
+            return;
+        }
+
         currentLobby?.Leave();
+
+        if (NetworkManager.Singleton == null)
+        {
+            return;
+        }
+
         if (NetworkManager.Singleton.IsHost)
         {
             NetworkManager.Singleton.OnServerStarted -= OnServerStarted;

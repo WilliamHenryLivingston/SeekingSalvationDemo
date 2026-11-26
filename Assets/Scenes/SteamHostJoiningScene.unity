@@ -492,6 +492,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 650551507}
   m_CullTransparentMesh: 1
+--- !u!1 &685369574 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4676676524606028391, guid: 42f69a874a802794c95170836d3b9990, type: 3}
+  m_PrefabInstance: {fileID: 7477256035503263805}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &685369578 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 599690135441710547, guid: 42f69a874a802794c95170836d3b9990, type: 3}
+  m_PrefabInstance: {fileID: 7477256035503263805}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685369574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c004e5d2df5ecba48b142eece91670d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SteamSessionManager
 --- !u!1 &1057864311
 GameObject:
   m_ObjectHideFlags: 0
@@ -677,7 +693,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1181785185}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 685369574}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1181785185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -969,7 +997,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1959426177}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 685369578}
+        m_TargetAssemblyTypeName: SteamSessionManager, Assembly-CSharp
+        m_MethodName: StartHost
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1959426177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1059,6 +1099,10 @@ PrefabInstance:
     - target: {fileID: 4676676524606028391, guid: 42f69a874a802794c95170836d3b9990, type: 3}
       propertyPath: m_Name
       value: Steam Network Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6774474021562565215, guid: 42f69a874a802794c95170836d3b9990, type: 3}
+      propertyPath: NetworkConfig.PlayerPrefab
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
